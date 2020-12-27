@@ -30,12 +30,20 @@ enum Operator_Type  // declare a operator
     OP_MUL,
     OP_DIV,
     OP_MOD,
-    OP_AND,
-    OP_OR,
+    OP_EQ,
+    OP_NE,
+    OP_ARRAY_NUM,
+    OP_STRUCT_MEMBER,
+    OP_GT,
+    OP_LE,
+    OP_LT,
+    OP_GE,
+    OP_LOG_AND,
+    OP_LOG_OR,
     OP_NOT,
     OP_NEG,
     OP_POS,
-
+    OP_ASSIGN,
     OP_ADDR,
     OP_POINT
 };

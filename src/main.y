@@ -1,7 +1,7 @@
 %{
     #include"common.h"
     #define YYSTYPE TreeNode *  
-    extern TreeNode * root;
+    extern TreeNode* root;
     extern int lineno;
     int yylex();
     int yyerror( char const * );
@@ -66,23 +66,34 @@
     | IF LPAREN bool_expr RPAREN field {$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_IF;$$->addChild($3);$$->addChild($5);}
     ;
 
-    while_stmt
+printf_stmt
+    : PRINTF LPAREN STRING COMMA exprs RPAREN{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_PRTF;$$->addChild($5);}
+
+scanf_stmt
+    : SCANF LPAREN STRING COMMA RPAREN {$$ = NEW TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_SCF;}
+    
+
+exprs
+    : expr COMMA exprs{$1->addsibLing($3);}
+    | expr{$$ = $1;}
+
+while_stmt
     : WHILE LPAREN bool_expr RPAREN field{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_WHILE;$$->addChild($3);$$->addChild($5);}
     ;
 
-    declare_stmt
+declare_stmt
     : type instructions{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_DECL;$$->addChild($1);$$->addChild($2);}
     ;
 
-    instructions 
+instructions 
     : instruction COMMA instructions {$1->addsibLing($3);}
     | instruction {$$ = $1;}
 
-    instruction
-    : IDENTIFIER ASSIGN expr {$$ = new TreeNode(lineno, NODE_STMT);$$->addChild($1);$$->addChild($3);}
+instruction
+    : IDENTIFIER LOP_ASSIGN expr {$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ASSIGN;$$->addChild($1);$$->addChild($3);}
     | variable{$$ = $1;}
 
-    idlist
+idlist
     : variable{
         $$ = $1;
     }
@@ -91,11 +102,46 @@
         $$ = $1;
     }
     ;
+
 variable 
     : IDENTIFIER{$$ = $1;}
     | IDENTIFIER LBRACK INTEGER RBRACK{$$ = $1;$$->array = true; $$->array_length[0] = $3->int_val;}
     | variable LBRACK INTEGER RBRACK{$$ = $1;$$->array_length[$$->dim_num++]=$3->int_val;}
     ;
+
+bool_expr
+    : LPAREN bool_expr RPAREN{$$ = $2;}
+    | expr EQ expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_EQ;$$->addChild($1);$$->addChild($3);}
+    | expr NE expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_NE;$$->addChild($1);$$->addChild($3);}
+    | expr GE expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_GE;$$->addChild($1);$$->addChild($3);}
+    | expr LE expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_LE;$$->addChild($1);$$->addChild($3);}
+    | expr LT expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_LT;$$->addChild($1);$$->addChild($3);}
+    | expr GT expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_GT;$$->addChild($1);$$->addChild($3);}
+    | bool_expr LOG_AND bool_expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_LOG_AND;$$->addChild($1);$$->addChild($3);}
+    | bool_expr LOG_OR bool_expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_LOG_OR;$$->addChild($1);$$->addChild($3);}
+    | NOT bool_expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_NOT;$$->addChild($2);}
+    ;
+
+all_value
+    : IDENTIFIER{$$ = $1;}
+    | all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$$->addChild($1);$$->addChild($3);}
+    | all_value POINT IDENTIFIER{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_STRUCT_MEMBER;$$->addChild($1);$$->addChild($3);}
+    ;
+
+
+expr
+    : INTEGER{$$ = $1;}
+    | all_value{$$ = $1;}
+    | LPAREN expr RPAREN{$$ = $2;}
+    | expr MUL expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MUL;$$->addChild($1);$$->addChild($3);}
+    | expr DIV expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_DIV;$$->addChild($1);$$->addChild($3);}
+    | expr ADD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ADD;$$->addChild($1);$$->addChild($3);}
+    | expr SUB expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_SUB;$$->addChild($1);$$->addChild($3);}
+    | SUB expr %prec NEG{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_NEG;$$->addChild($2);}
+    | ADD expr %prec POS{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_POS;$$->addChild($2);}
+    ;
+
+
 
 type
     : T_INT{
