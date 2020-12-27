@@ -496,18 +496,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  8
+#define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   6
+#define YYLAST   10
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  57
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  2
+#define YYNNTS  3
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  6
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  9
+#define YYNSTATES  13
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   311
@@ -560,7 +560,7 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    41,    41,    44,    47,    50,    53
+       0,    39,    39,    42,    48,    49,    50
 };
 #endif
 
@@ -577,7 +577,7 @@ static const char *const yytname[] =
   "POINT", "LPAREN", "RPAREN", "LBRACK", "RBRACK", "LBRACE", "RBRACE",
   "GT", "LT", "GE", "LE", "EQ", "NE", "ADD", "SUB", "MUL", "DIV", "MOD",
   "LOG_AND", "LOG_OR", "NOT", "NEG", "POS", "SELF_INC", "SELF_DEC",
-  "GET_ADDRESS", "$accept", "type", YY_NULLPTR
+  "GET_ADDRESS", "$accept", "idlist", "variable", YY_NULLPTR
 };
 #endif
 
@@ -595,7 +595,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-24)
+#define YYPACT_NINF (-33)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -609,7 +609,8 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -10,   -24,   -24,   -24,   -24,   -23,     6,   -24,   -24
+     -23,   -32,     3,   -30,   -20,   -33,   -23,   -19,   -28,   -33,
+     -27,   -33,   -33
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -617,19 +618,20 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     2,     3,     5,     4,     0,     0,     6,     1
+       0,     4,     0,     2,     0,     1,     0,     0,     0,     3,
+       0,     5,     6
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -24,   -24
+     -33,     4,   -33
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     6
+      -1,     2,     3
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -637,31 +639,34 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       1,     7,     2,     3,     4,     5,     8
+       6,     1,     4,     5,     7,     8,    10,    11,    12,     0,
+       9
 };
 
 static const yytype_int8 yycheck[] =
 {
-      10,    24,    12,    13,    14,    15,     0
+      30,    24,    34,     0,    34,    25,    25,    35,    35,    -1,
+       6
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    10,    12,    13,    14,    15,    58,    24,     0
+       0,    24,    58,    59,    34,     0,    30,    34,    25,    58,
+      25,    35,    35
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    57,    58,    58,    58,    58,    58
+       0,    57,    58,    58,    59,    59,    59
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     1,     2
+       0,     2,     1,     3,     1,     4,     4
 };
 
 
@@ -1357,42 +1362,37 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 41 "src/main.y"
-           {
-        yyval = new TreeNode(lineno, NODE_TYPE);yyval->type = TYPE_INT;
+#line 39 "src/main.y"
+              {
+        yyval = yyvsp[0];
     }
-#line 1365 "src/main.tab.cpp"
+#line 1370 "src/main.tab.cpp"
     break;
 
   case 3:
-#line 44 "src/main.y"
-            {
-        yyval = new TreeNode(lineno, NODE_TYPE);yyval->type = TYPE_CHAR;
+#line 42 "src/main.y"
+                           {
+        yyvsp[-2]->addsibLing(yyvsp[0]);
+        yyval = yyvsp[-2];
     }
-#line 1373 "src/main.tab.cpp"
+#line 1379 "src/main.tab.cpp"
     break;
 
   case 4:
-#line 47 "src/main.y"
-            {
-        yyval = new TreeNode(lineno, NODE_TYPE);yyval->type = TYPE_VOID;
-    }
-#line 1381 "src/main.tab.cpp"
+#line 48 "src/main.y"
+                {yyval = yyvsp[0];}
+#line 1385 "src/main.tab.cpp"
     break;
 
   case 5:
-#line 50 "src/main.y"
-              {
-        yyval = new TreeNode(lineno, NODE_TYPE);yyval->type = TYPE_STRING;
-    }
-#line 1389 "src/main.tab.cpp"
+#line 49 "src/main.y"
+                                      {yyval = yyvsp[-3];yyval->array = true; yyval->array_length[0] = yyvsp[-1]->int_val;}
+#line 1391 "src/main.tab.cpp"
     break;
 
   case 6:
-#line 53 "src/main.y"
-                         {
-        yyval = new TreeNode(lineno, NODE_TYPE);yyval->type = TYPE_STRUCT;
-    }
+#line 50 "src/main.y"
+                                    {yyval = yyvsp[-3];yyval->array_length[yyval->dim_num++]=yyvsp[-1]->int_val;}
 #line 1397 "src/main.tab.cpp"
     break;
 
@@ -1629,7 +1629,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 72 "src/main.y"
+#line 70 "src/main.y"
 
 
 int yyerror(char const* message)

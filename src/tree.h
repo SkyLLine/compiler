@@ -68,7 +68,7 @@ enum Stmt_Type{   //decalre statement sentence
 
     STMT_IF_ELSE,
     STMT_IF,
-    STMT_BLOCK,
+    STMT_FIELD,
 };
 
 struct TreeNode {

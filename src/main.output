@@ -1,7 +1,6 @@
 Nonterminals useless in grammar
 
-    variable
-    idlist
+    type
 
 
 Terminals unused in grammar
@@ -13,7 +12,12 @@ Terminals unused in grammar
     RETURN
     PRINTF
     SCANF
+    T_INT
     T_BOOL
+    T_CHAR
+    T_STRING
+    T_VOID
+    T_STRUCT
     T_INT_POINTER
     T_CHAR_POINTER
     LOP_ASSIGN
@@ -22,17 +26,13 @@ Terminals unused in grammar
     MUL_ASSIGN
     DIV_ASSIGN
     MOD_ASSIGN
-    INTEGER
     CHAR
     BOOL
     STRING
     SEMICOLON
-    COMMA
     POINT
     LPAREN
     RPAREN
-    LBRACK
-    RBRACK
     LBRACE
     RBRACE
     GT
@@ -58,23 +58,26 @@ Terminals unused in grammar
 
 Rules useless in grammar
 
-    6 variable: IDENTIFIER
-    7         | IDENTIFIER LBRACK INTEGER RBRACK
-    8         | variable LBRACK INTEGER RBRACK
+    6 type: T_INT
+    7     | T_CHAR
+    8     | T_VOID
+    9     | T_STRING
+   10     | T_STRUCT IDENTIFIER
 
-    9 idlist: variable
-   10       | variable COMMA idlist
+
+State 1 conflicts: 1 shift/reduce
 
 
 Grammar
 
-    0 $accept: type $end
+    0 $accept: idlist $end
 
-    1 type: T_INT
-    2     | T_CHAR
-    3     | T_VOID
-    4     | T_STRING
-    5     | T_STRUCT IDENTIFIER
+    1 idlist: variable
+    2       | variable COMMA idlist
+
+    3 variable: IDENTIFIER
+    4         | IDENTIFIER LBRACK INTEGER RBRACK
+    5         | variable LBRACK INTEGER RBRACK
 
 
 Terminals, with rules where they appear
@@ -88,12 +91,12 @@ Terminals, with rules where they appear
     RETURN (262)
     PRINTF (263)
     SCANF (264)
-    T_INT (265) 1
+    T_INT (265)
     T_BOOL (266)
-    T_CHAR (267) 2
-    T_STRING (268) 4
-    T_VOID (269) 3
-    T_STRUCT (270) 5
+    T_CHAR (267)
+    T_STRING (268)
+    T_VOID (269)
+    T_STRUCT (270)
     T_INT_POINTER (271)
     T_CHAR_POINTER (272)
     LOP_ASSIGN (273)
@@ -102,18 +105,18 @@ Terminals, with rules where they appear
     MUL_ASSIGN (276)
     DIV_ASSIGN (277)
     MOD_ASSIGN (278)
-    IDENTIFIER (279) 5
-    INTEGER (280)
+    IDENTIFIER (279) 3 4
+    INTEGER (280) 4 5
     CHAR (281)
     BOOL (282)
     STRING (283)
     SEMICOLON (284)
-    COMMA (285)
+    COMMA (285) 2
     POINT (286)
     LPAREN (287)
     RPAREN (288)
-    LBRACK (289)
-    RBRACK (290)
+    LBRACK (289) 4 5
+    RBRACK (290) 4 5
     LBRACE (291)
     RBRACE (292)
     GT (293)
@@ -141,75 +144,115 @@ Nonterminals, with rules where they appear
 
     $accept (57)
         on left: 0
-    type (58)
-        on left: 1 2 3 4 5
-        on right: 0
+    idlist (58)
+        on left: 1 2
+        on right: 0 2
+    variable (59)
+        on left: 3 4 5
+        on right: 1 2 5
 
 
 State 0
 
-    0 $accept: . type $end
+    0 $accept: . idlist $end
 
-    T_INT     shift, and go to state 1
-    T_CHAR    shift, and go to state 2
-    T_STRING  shift, and go to state 3
-    T_VOID    shift, and go to state 4
-    T_STRUCT  shift, and go to state 5
+    IDENTIFIER  shift, and go to state 1
 
-    type  go to state 6
+    idlist    go to state 2
+    variable  go to state 3
 
 
 State 1
 
-    1 type: T_INT .
+    3 variable: IDENTIFIER .
+    4         | IDENTIFIER . LBRACK INTEGER RBRACK
 
-    $default  reduce using rule 1 (type)
+    LBRACK  shift, and go to state 4
+
+    LBRACK    [reduce using rule 3 (variable)]
+    $default  reduce using rule 3 (variable)
 
 
 State 2
 
-    2 type: T_CHAR .
+    0 $accept: idlist . $end
 
-    $default  reduce using rule 2 (type)
+    $end  shift, and go to state 5
 
 
 State 3
 
-    4 type: T_STRING .
+    1 idlist: variable .
+    2       | variable . COMMA idlist
+    5 variable: variable . LBRACK INTEGER RBRACK
 
-    $default  reduce using rule 4 (type)
+    COMMA   shift, and go to state 6
+    LBRACK  shift, and go to state 7
+
+    $default  reduce using rule 1 (idlist)
 
 
 State 4
 
-    3 type: T_VOID .
+    4 variable: IDENTIFIER LBRACK . INTEGER RBRACK
 
-    $default  reduce using rule 3 (type)
+    INTEGER  shift, and go to state 8
 
 
 State 5
 
-    5 type: T_STRUCT . IDENTIFIER
+    0 $accept: idlist $end .
 
-    IDENTIFIER  shift, and go to state 7
+    $default  accept
 
 
 State 6
 
-    0 $accept: type . $end
+    2 idlist: variable COMMA . idlist
 
-    $end  shift, and go to state 8
+    IDENTIFIER  shift, and go to state 1
+
+    idlist    go to state 9
+    variable  go to state 3
 
 
 State 7
 
-    5 type: T_STRUCT IDENTIFIER .
+    5 variable: variable LBRACK . INTEGER RBRACK
 
-    $default  reduce using rule 5 (type)
+    INTEGER  shift, and go to state 10
 
 
 State 8
 
-    0 $accept: type $end .
+    4 variable: IDENTIFIER LBRACK INTEGER . RBRACK
 
-    $default  accept
+    RBRACK  shift, and go to state 11
+
+
+State 9
+
+    2 idlist: variable COMMA idlist .
+
+    $default  reduce using rule 2 (idlist)
+
+
+State 10
+
+    5 variable: variable LBRACK INTEGER . RBRACK
+
+    RBRACK  shift, and go to state 12
+
+
+State 11
+
+    4 variable: IDENTIFIER LBRACK INTEGER RBRACK .
+
+    $default  reduce using rule 4 (variable)
+
+
+State 12
+
+    5 variable: variable LBRACK INTEGER RBRACK .
+
+    $default  reduce using rule 5 (variable)
