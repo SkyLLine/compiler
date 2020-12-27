@@ -1,0 +1,215 @@
+Nonterminals useless in grammar
+
+    variable
+    idlist
+
+
+Terminals unused in grammar
+
+    IF
+    ELSE
+    WHILE
+    FOR
+    RETURN
+    PRINTF
+    SCANF
+    T_BOOL
+    T_INT_POINTER
+    T_CHAR_POINTER
+    LOP_ASSIGN
+    ADD_ASSIGN
+    SUB_ASSIGN
+    MUL_ASSIGN
+    DIV_ASSIGN
+    MOD_ASSIGN
+    INTEGER
+    CHAR
+    BOOL
+    STRING
+    SEMICOLON
+    COMMA
+    POINT
+    LPAREN
+    RPAREN
+    LBRACK
+    RBRACK
+    LBRACE
+    RBRACE
+    GT
+    LT
+    GE
+    LE
+    EQ
+    NE
+    ADD
+    SUB
+    MUL
+    DIV
+    MOD
+    LOG_AND
+    LOG_OR
+    NOT
+    NEG
+    POS
+    SELF_INC
+    SELF_DEC
+    GET_ADDRESS
+
+
+Rules useless in grammar
+
+    6 variable: IDENTIFIER
+    7         | IDENTIFIER LBRACK INTEGER RBRACK
+    8         | variable LBRACK INTEGER RBRACK
+
+    9 idlist: variable
+   10       | variable COMMA idlist
+
+
+Grammar
+
+    0 $accept: type $end
+
+    1 type: T_INT
+    2     | T_CHAR
+    3     | T_VOID
+    4     | T_STRING
+    5     | T_STRUCT IDENTIFIER
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    IF (258)
+    ELSE (259)
+    WHILE (260)
+    FOR (261)
+    RETURN (262)
+    PRINTF (263)
+    SCANF (264)
+    T_INT (265) 1
+    T_BOOL (266)
+    T_CHAR (267) 2
+    T_STRING (268) 4
+    T_VOID (269) 3
+    T_STRUCT (270) 5
+    T_INT_POINTER (271)
+    T_CHAR_POINTER (272)
+    LOP_ASSIGN (273)
+    ADD_ASSIGN (274)
+    SUB_ASSIGN (275)
+    MUL_ASSIGN (276)
+    DIV_ASSIGN (277)
+    MOD_ASSIGN (278)
+    IDENTIFIER (279) 5
+    INTEGER (280)
+    CHAR (281)
+    BOOL (282)
+    STRING (283)
+    SEMICOLON (284)
+    COMMA (285)
+    POINT (286)
+    LPAREN (287)
+    RPAREN (288)
+    LBRACK (289)
+    RBRACK (290)
+    LBRACE (291)
+    RBRACE (292)
+    GT (293)
+    LT (294)
+    GE (295)
+    LE (296)
+    EQ (297)
+    NE (298)
+    ADD (299)
+    SUB (300)
+    MUL (301)
+    DIV (302)
+    MOD (303)
+    LOG_AND (304)
+    LOG_OR (305)
+    NOT (306)
+    NEG (307)
+    POS (308)
+    SELF_INC (309)
+    SELF_DEC (310)
+    GET_ADDRESS (311)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (57)
+        on left: 0
+    type (58)
+        on left: 1 2 3 4 5
+        on right: 0
+
+
+State 0
+
+    0 $accept: . type $end
+
+    T_INT     shift, and go to state 1
+    T_CHAR    shift, and go to state 2
+    T_STRING  shift, and go to state 3
+    T_VOID    shift, and go to state 4
+    T_STRUCT  shift, and go to state 5
+
+    type  go to state 6
+
+
+State 1
+
+    1 type: T_INT .
+
+    $default  reduce using rule 1 (type)
+
+
+State 2
+
+    2 type: T_CHAR .
+
+    $default  reduce using rule 2 (type)
+
+
+State 3
+
+    4 type: T_STRING .
+
+    $default  reduce using rule 4 (type)
+
+
+State 4
+
+    3 type: T_VOID .
+
+    $default  reduce using rule 3 (type)
+
+
+State 5
+
+    5 type: T_STRUCT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 7
+
+
+State 6
+
+    0 $accept: type . $end
+
+    $end  shift, and go to state 8
+
+
+State 7
+
+    5 type: T_STRUCT IDENTIFIER .
+
+    $default  reduce using rule 5 (type)
+
+
+State 8
+
+    0 $accept: type $end .
+
+    $default  accept

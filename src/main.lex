@@ -1,7 +1,7 @@
 %option nounput
 %{
 #include "common.h"
-#include "com.tab.h"  // yacc header
+#include "main.tab.h"  // yacc header
 int lineno=1;
 %}
 BLOCKCOMMENT \/\*([^\*^\/]*|[\*^\/\*]*|[^\**\/]*)*\*\/
@@ -65,8 +65,8 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "/" return DIV;
 "%" return MOD;
 
-"&&" return AND;
-"||" return OR;
+"&&" return LOG_AND;
+"||" return LOG_OR;
 "!" return NOT;
 
 
@@ -81,7 +81,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 "," return COMMA;
 ";" return  SEMICOLON;
 
-{INTEGER}{
+{INTEGER} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_INT;
     node->int_val = atoi(yytext);
@@ -89,7 +89,8 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     yylval = node;
     return INTEGER;
 }
-{CHAR}{
+
+{CHAR} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_CHAR;
     node->char_val = yytext[1];
@@ -98,7 +99,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     return CHAR;
 }
 
-{STRING}{
+{STRING} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->type = TYPE_STRING;
     int i = 1;
@@ -108,7 +109,8 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
     yylval = node;
     return STRING;
 }
-{IDENTIFIER}{
+
+{IDENTIFIER} { 
     TreeNode* node = new TreeNode(lineno, NODE_VAR);
     node->variable_name = string(yytext);
     yylval = node;

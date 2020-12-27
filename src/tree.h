@@ -35,9 +35,6 @@ enum Operator_Type  // declare a operator
     OP_NOT,
     OP_NEG,
     OP_POS,
-    OP_AND,
-    OP_OR,
-    OP_NOT,
 
     OP_ADDR,
     OP_POINT
@@ -103,6 +100,9 @@ struct TreeNode {
     string string_val;
     char char_val;
     bool bool_val;
+    bool array = false;
+    int array_length[10];
+    int dim_num = 1;
     string variable_name;
     int lex;
     int field;
