@@ -1,7 +1,7 @@
 %{
     #include"common.h"
     #define YYSTYPE TreeNode *  
-    extern TreeNode* root;
+    TreeNode* root;
     extern int lineno;
     int yylex();
     int yyerror( char const * );
@@ -57,24 +57,33 @@
     | SEMICOLON{}
     ;
 
-    field 
+field 
     : LBRACE statements RBRACE{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FIELD; $$->addChild($2);}
     ;
 
-    if_else_stmt
+for_stmt 
+    : FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FOR;$$->addChild($3);$$->addChild($5);$$->addChild($7);$$->addChild($9);}
+
+assign_stmt
+    : simple_instructions {$$ = new TreeNode(lineno, NODE_STMT);$$->addChild($1);$$->stmtType = STMT_ASSIGN;}
+
+
+if_else_stmt
     : IF LPAREN bool_expr RPAREN field ELSE field{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_IF_ELSE;$$->addChild($3);$$->addChild($5);$$->addChild($7);}
     | IF LPAREN bool_expr RPAREN field {$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_IF;$$->addChild($3);$$->addChild($5);}
     ;
 
 printf_stmt
-    : PRINTF LPAREN STRING COMMA exprs RPAREN{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_PRTF;$$->addChild($5);}
+    : PRINTF LPAREN STRING COMMA exprs RPAREN{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_PRTF;$$->addChild($3);$$->addChild($5);}
+    | PRINTF LPAREN STRING RPAREN{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_PRTF;$$->addChild($3);}
+
 
 scanf_stmt
-    : SCANF LPAREN STRING COMMA RPAREN {$$ = NEW TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_SCF;}
+    : SCANF LPAREN STRING COMMA all_values RPAREN {$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_SCF;}
     
 
 exprs
-    : expr COMMA exprs{$1->addsibLing($3);}
+    : expr COMMA exprs{$1->addsibLing($3);$$ = $1;}
     | expr{$$ = $1;}
 
 while_stmt
@@ -83,6 +92,15 @@ while_stmt
 
 declare_stmt
     : type instructions{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_DECL;$$->addChild($1);$$->addChild($2);}
+    ;
+
+simple_instructions
+    : simple_instruction COMMA simple_instructions{$1->addsibLing($3);$$ = $1;}
+    | simple_instruction {$$ = $1;}
+
+simple_instruction
+    : all_value LOP_ASSIGN expr {$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ASSIGN; $$->addChild($1);$$->addChild($3);}
+    | all_value LOP_ASSIGN bool_expr {$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ASSIGN;$$->addChild($1);$$->addChild($3);}
     ;
 
 instructions 
@@ -122,8 +140,13 @@ bool_expr
     | NOT bool_expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_NOT;$$->addChild($2);}
     ;
 
+all_values
+    : all_value COMMA all_values {$$ = $1;$$->addsibLing($3);}
+    | all_value {$$ = $1;}
+
 all_value
     : IDENTIFIER{$$ = $1;}
+    | LPAREN all_value RPAREN{$$ = $2;}
     | all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$$->addChild($1);$$->addChild($3);}
     | all_value POINT IDENTIFIER{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_STRUCT_MEMBER;$$->addChild($1);$$->addChild($3);}
     ;
@@ -133,6 +156,7 @@ expr
     : INTEGER{$$ = $1;}
     | all_value{$$ = $1;}
     | LPAREN expr RPAREN{$$ = $2;}
+    | expr MOD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MOD;$$->addChild($1);$$->addChild($3);}
     | expr MUL expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MUL;$$->addChild($1);$$->addChild($3);}
     | expr DIV expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_DIV;$$->addChild($1);$$->addChild($3);}
     | expr ADD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ADD;$$->addChild($1);$$->addChild($3);}
