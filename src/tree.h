@@ -40,6 +40,7 @@ enum Operator_Type  // declare a operator
     OP_GE,
     OP_LOG_AND,
     OP_LOG_OR,
+    OP_FUNC,
     OP_NOT,
     OP_NEG,
     OP_POS,
@@ -62,6 +63,7 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_FUNC_DECL,
     STMT_FUNC_DEF,
     STMT_FUNC_USE,
+    STMT_PARA,
 
     STMT_ADD_ASSIGN,
     STMT_SUB_ASSIGN,
@@ -109,6 +111,7 @@ struct TreeNode {
     char char_val;
     bool bool_val;
     bool array = false;
+    string func_name;
     int array_length[10];
     int dim_num = 1;
     string variable_name;

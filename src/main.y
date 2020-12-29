@@ -36,15 +36,43 @@
 
 %%
     program
-    : statements{root = new TreeNode(0, NODE_PROG);root->addChild($1);}
+    : parts{root = new TreeNode(0, NODE_PROG);root->addChild($1);}
     ;
 
-    statements
+parts
+    : part parts{$1->addsibLing($2);}
+    | part{$$ = $1;}
+    ;
+
+part
+    : function_declaration{$$ = $1;}
+   
+    ;
+
+function_declaration
+    : type IDENTIFIER LPAREN parameters RPAREN LBRACE statements RBRACE{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FUNC_DECL;
+    $$->addChild($1);$$->addChild($2);$$->addChild($4);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
+    $$->addChild(tmp);tmp->addChild($7);}
+    | type IDENTIFIER LPAREN RPAREN LBRACE statements RBRACE{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FUNC_DECL;
+    $$->addChild($1);$$->addChild($2);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
+    $$->addChild(tmp);tmp->addChild($6);}
+    ;
+
+parameters
+    : parameter{$$ = $1;}
+    | parameter COMMA parameters{$$ = $1;$1->addsibLing($3);}
+    ;
+
+parameter
+    : type IDENTIFIER{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_PARA;$$->addChild($1);$$->addChild($2);}
+    ;
+
+statements
     : statement{$$ = $1;}
     | statement statements{$$ = $1; $$->addsibLing($2);}
     ;
 
-    statement
+statement
     : declare_stmt SEMICOLON{$$ = $1;}
     | assign_stmt SEMICOLON{$$ = $1;}
     | for_stmt {$$ = $1;}
@@ -101,6 +129,8 @@ simple_instructions
 simple_instruction
     : all_value LOP_ASSIGN expr {$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ASSIGN; $$->addChild($1);$$->addChild($3);}
     | all_value LOP_ASSIGN bool_expr {$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ASSIGN;$$->addChild($1);$$->addChild($3);}
+    | expr{$$ = $1;}
+    | bool_expr{$$ = $1;}
     ;
 
 instructions 
@@ -155,6 +185,7 @@ all_value
 expr
     : INTEGER{$$ = $1;}
     | all_value{$$ = $1;}
+    | IDENTIFIER LPAREN number_list RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($3);}
     | LPAREN expr RPAREN{$$ = $2;}
     | expr MOD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MOD;$$->addChild($1);$$->addChild($3);}
     | expr MUL expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MUL;$$->addChild($1);$$->addChild($3);}
@@ -165,6 +196,12 @@ expr
     | ADD expr %prec POS{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_POS;$$->addChild($2);}
     ;
 
+number_list
+    : expr{$$ = $1;}
+    | bool_expr{$$ = $1;}
+    | bool_expr COMMA number_list{$$ = $1;$$->addsibLing($3);}
+    | expr COMMA number_list{$$ = $1;$$->addsibLing($3);}
+    ;
 
 
 type
