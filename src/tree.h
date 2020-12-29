@@ -81,6 +81,18 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_FIELD,
 };
 
+struct field {
+    public:
+    int field_id;
+    field* father_field;
+    field* son_field;
+    field* sibling_field;
+
+    void goto_son_field();
+    void goto_father_field();
+};
+
+
 struct TreeNode {
     public:
     int nodeID;
