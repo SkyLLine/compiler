@@ -71,7 +71,7 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_DIV_ASSIGN,
     STMT_MOD_ASSIGN,
 
-    STMT_SELF_ADD_R,
+    STMT_SELF_ADD_R,   
     STMT_SELF_ADD_L,
     STMT_SELF_SUB_R,
     STMT_SELF_SUB_L,
@@ -81,15 +81,19 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_FIELD,
 };
 
-struct field {
+struct Field {
     public:
     int field_id;
-    field* father_field;
-    field* son_field;
-    field* sibling_field;
+    Field* father_field;
+    Field* son_field;
+    Field* sibling_field;
+    int size = 0;
+    string table[100];
+    Type type[100];
 
-    void goto_son_field();
-    void goto_father_field();
+
+    // Field* goto_son_field(Field* current);      
+    // Field* goto_father_field(Field* current);
 };
 
 
@@ -128,7 +132,7 @@ struct TreeNode {
     int dim_num = 1;
     string variable_name;
     int lex;
-    int field;
+    Field* F;
 
     string Node2String();
     string getField();

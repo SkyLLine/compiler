@@ -7,8 +7,8 @@ I'm level 1 test.
 //     char b;
 //     int a[5][3];
 // };
-
-void good(int aa, int bb)
+int a = 5;
+void good(char aa, int bb)
 {
     printf("%c, %d\n", aa, bb);
     int d = bb;

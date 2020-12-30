@@ -2,6 +2,7 @@
     #include"common.h"
     #define YYSTYPE TreeNode *  
     TreeNode* root;
+    Field* rootf;
     extern int lineno;
     int yylex();
     int yyerror( char const * );
@@ -45,8 +46,8 @@ parts
     ;
 
 part
-    : function_declaration{$$ = $1;}
-   
+    : statement{$$ = $1;}
+    | function_declaration{$$ = $1;}
     ;
 
 function_declaration
