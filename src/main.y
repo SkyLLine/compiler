@@ -2,7 +2,6 @@
     #include"common.h"
     #define YYSTYPE TreeNode *  
     TreeNode* root;
-    Field* rootf;
     extern int lineno;
     int yylex();
     int yyerror( char const * );
