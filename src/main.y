@@ -40,7 +40,7 @@
     ;
 
 parts
-    : part parts{$1->addsibLing($2);}
+    : part parts{$1->addsibLing($2);$$ = $1;}
     | part{$$ = $1;}
     ;
 
@@ -51,10 +51,10 @@ part
 
 function_declaration
     : type IDENTIFIER LPAREN parameters RPAREN LBRACE statements RBRACE{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FUNC_DECL;
-    $$->addChild($1);$$->addChild($2);$$->addChild($4);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
+    $$->addChild($1);$2->nodeType = NODE_FUNC; $$->addChild($2);$$->addChild($4);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
     $$->addChild(tmp);tmp->addChild($7);}
     | type IDENTIFIER LPAREN RPAREN LBRACE statements RBRACE{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FUNC_DECL;
-    $$->addChild($1);$$->addChild($2);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
+    $$->addChild($1);$2->nodeType = NODE_FUNC; $$->addChild($2);TreeNode *tmp = new TreeNode(lineno, NODE_STMT);tmp->stmtType = STMT_FUNC_DEF;
     $$->addChild(tmp);tmp->addChild($6);}
     ;
 
@@ -175,11 +175,11 @@ all_values
     | all_value {$$ = $1;}
 
 all_value
-    : IDENTIFIER{$$ = $1;}
-    | LPAREN all_value RPAREN{$$ = $2;}
-    | all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$$->addChild($1);$$->addChild($3);}
+    : all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$$->addChild($1);$$->addChild($3);}
     | all_value POINT IDENTIFIER{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_STRUCT_MEMBER;$$->addChild($1);$$->addChild($3);}
-    ;
+    | IDENTIFIER{$$ = $1;}
+    | LPAREN all_value RPAREN{$$ = $2;}
+       ;
 
 
 expr
@@ -206,19 +206,22 @@ number_list
 
 type
     : T_INT{
-        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = TYPE_INT;
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "int";
     }
     | T_CHAR{
-        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = TYPE_CHAR;
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "char";
     }
     | T_VOID{
-        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = TYPE_VOID;
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "void";
     }
     | T_STRING{
-        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = TYPE_STRING;
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "string";
+    }
+    | T_BOOL{
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "bool";
     }
     | T_STRUCT IDENTIFIER{
-        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = TYPE_STRUCT;
+        $$ = new TreeNode(lineno, NODE_TYPE);$$->type = "struct";
     }
     ;
 %%

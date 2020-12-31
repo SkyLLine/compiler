@@ -12,7 +12,8 @@ enum Node_Type // declare a type
     NODE_TYPE,
     NODE_STMT,
     NODE_PROG,
-    NODE_MAIN
+    NODE_FUNC,
+    NODE_NONE
 };
 
 enum Const_Type
@@ -25,32 +26,33 @@ enum Const_Type
 
 enum Operator_Type  // declare a operator
 {
-    OP_ADD = 1,
-    OP_SUB,
-    OP_MUL,
-    OP_DIV,
-    OP_MOD,
-    OP_EQ,
-    OP_NE,
+    OP_ADD = 1,//1
+    OP_SUB,//1
+    OP_MUL,//1
+    OP_DIV,//1
+    OP_MOD,//1
+    OP_EQ,//2
+    OP_NE,//2
     OP_ARRAY_NUM,
     OP_STRUCT_MEMBER,
-    OP_GT,
-    OP_LE,
-    OP_LT,
-    OP_GE,
-    OP_LOG_AND,
-    OP_LOG_OR,
+    OP_GT,//3
+    OP_LE,//3
+    OP_LT,//3
+    OP_GE,//3
+    OP_LOG_AND,//4
+    OP_LOG_OR,//4
     OP_FUNC,
     OP_NOT,
     OP_NEG,
     OP_POS,
-    OP_ASSIGN,
+    OP_ASSIGN,//1
     OP_ADDR,
     OP_POINT
 };
 
 enum Stmt_Type{   //decalre statement sentence
     STMT_SKIP = 1,
+    STMT_NONE,
     STMT_DEFINE,
     STMT_ASSIGN,
     STMT_DECL,
@@ -81,15 +83,23 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_FIELD,
 };
 
+enum ID_Type{
+    ID_FUNC,
+    ID_VAR,
+    ID_ARRAY
+};
+
 struct Field {
     public:
     int field_id;
-    Field* father_field;
-    Field* son_field;
-    Field* sibling_field;
+    Field* father_field = nullptr;
+    static int current_field_id;
+    Field* son_field = nullptr;
+    Field* sibling_field = nullptr;
     int size = 0;
     string table[100];
-    Type type[100];
+    string type[100];
+    ID_Type id_type[100];
 
 
     // Field* goto_son_field(Field* current);      
@@ -101,10 +111,10 @@ struct TreeNode {
     public:
     int nodeID;
     int lineno;
-    Node_Type nodeType;
+    Node_Type nodeType = NODE_NONE;
 
-    TreeNode* child;
-    TreeNode* sibling;
+    TreeNode* child = nullptr;
+    TreeNode* sibling = nullptr;
 
     void addChild(TreeNode* child);
     void addsibLing(TreeNode* sibling);
@@ -120,12 +130,13 @@ struct TreeNode {
     public:
     Const_Type constType;
     Operator_Type operatorType;
-    Type* type;
-    Stmt_Type stmtType;
+    string type;
+    Stmt_Type stmtType = STMT_NONE;
     int int_val;
     string string_val;
     char char_val;
     bool bool_val;
+    static int current_node_id;
     bool array = false;
     string func_name;
     int array_length[10];

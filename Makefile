@@ -30,4 +30,3 @@ clean:
 
 test: 
 	./bin/main tests/test.c > result.txt
-

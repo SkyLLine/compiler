@@ -83,29 +83,38 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 
 {INTEGER} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
-    node->type = TYPE_INT;
     node->int_val = atoi(yytext);
     node->constType = CON_INT;
+    node->type = "int";
+    yylval = node;
+    return INTEGER;
+}
+
+{BOOL} {
+    TreeNode* node = new TreeNode(lineno, NODE_CONST);
+    node->int_val = atoi(yytext);
+    node->constType = CON_BOOL;
+    node->type = "bool";
     yylval = node;
     return INTEGER;
 }
 
 {CHAR} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
-    node->type = TYPE_CHAR;
     node->char_val = yytext[1];
     node->constType = CON_CHAR;
+    node->type = "char";
     yylval = node;
     return CHAR;
 }
 
 {STRING} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
-    node->type = TYPE_STRING;
     int i = 1;
     for(;yytext[i]!='\"';i++)
         node->string_val += (char)yytext[i];
     node->constType = CON_STRING;
+    node->type = "string";
     yylval = node;
     return STRING;
 }

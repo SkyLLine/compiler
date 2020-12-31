@@ -14,6 +14,7 @@ enum ValueType
 
     VALUE_INT_POINTER,
     VALUE_CHAR_POINTER,
+    VALUE_WRONG,
     COMPOSE_STRUCT,
     COMPOSE_UNION,
     COMPOSE_FUNCTION
@@ -47,7 +48,7 @@ static Type* TYPE_STRUCT = new Type(VALUE_STRUCT);
 static Type* TYPE_STRING = new Type(VALUE_STRING);
 static Type* TYPE_INT_POINTER = new Type(VALUE_INT_POINTER);
 static Type* TYPE_CHAR_POINTER = new Type(VALUE_CHAR_POINTER);
-
+static Type* TYPE_WRONG = new Type(VALUE_WRONG);
 
 int getSize(Type* type);
 

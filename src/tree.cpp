@@ -1,5 +1,5 @@
 #include "tree.h"
-
+int TreeNode::current_node_id=0;
 /*
     void addChild(TreeNode* child);
     void addsibLing(TreeNode* sibling);
@@ -29,12 +29,12 @@ void TreeNode::addChild(TreeNode* child)
 
 void TreeNode::addsibLing(TreeNode* sibling)
 {
-    TreeNode* tmp = this->sibling;
-    while(tmp != nullptr)
+    TreeNode* tmp = this;
+    while(tmp->sibling != nullptr)
     {
         tmp = tmp->sibling;
     }
-    tmp = this->sibling;
+    tmp->sibling = sibling;
 }
 
 TreeNode::TreeNode(int lineno, Node_Type Type)
@@ -43,3 +43,46 @@ TreeNode::TreeNode(int lineno, Node_Type Type)
     this->nodeType = Type;
 }
 
+void TreeNode::genNodeId() {
+    this->nodeID=current_node_id;
+
+    if(this->child!=nullptr)
+     {;
+        current_node_id++;
+        this->child->genNodeId();
+    }
+    if(this->sibling!=nullptr)
+     {
+        current_node_id++;
+        this->sibling->genNodeId();
+    }
+
+    return;
+}
+
+void TreeNode::printNodeInfo()
+{
+        cout<<"lineno "<<lineno<<" ";
+    cout<<nodeID<<" ";
+    if(nodeType == 1)cout<<"NODE_CONST "<<int_val;
+    if(nodeType == 2)cout<<"NODE_VAR "<<variable_name;
+    if(nodeType == 3)cout<<"NODE_EXPR "<<operatorType;
+    if(nodeType == 4)cout<<"NODE_TYPE ";
+    if(nodeType == 5)cout<<"NODE_STMT";
+    if(nodeType == 6)cout<<"NODE_PROG";
+    if(nodeType == 7)cout<<"NODE_FUNC ";
+    if(nodeType == 8)cout<<"NODE_NONE";
+    cout<<" child: ";
+     for(TreeNode*t=this->child;t!=nullptr;t=t->sibling)
+        cout<<" @"<<t->nodeID;
+        cout<<'\n';
+}
+
+void TreeNode::printAST() {
+    this->printNodeInfo();
+    if(this->child!=nullptr)
+        this->child->printAST();
+    if(this->sibling!=nullptr)
+        this->sibling->printAST();
+
+}
