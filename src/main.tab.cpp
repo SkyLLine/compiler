@@ -1777,7 +1777,7 @@ yyreduce:
 
   case 48:
 #line 157 "src/main.y"
-                                    {yyval = yyvsp[-3];yyval->array_length[yyval->dim_num++]=yyvsp[-1]->int_val;}
+                                    {yyval = yyvsp[-3];yyval->array_length[yyval->dim_num++]=yyvsp[-1]->int_val;yyval->current_dim_num++;}
 #line 1782 "src/main.tab.cpp"
     break;
 

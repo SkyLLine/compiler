@@ -99,6 +99,7 @@ struct Field {
     int size = 0;
     string table[100];
     string type[100];
+    int dim[100];
     ID_Type id_type[100];
 
 
@@ -138,9 +139,11 @@ struct TreeNode {
     bool bool_val;
     static int current_node_id;
     bool array = false;
+    bool func = false;
     string func_name;
     int array_length[10];
     int dim_num = 1;
+    int current_dim_num = 1;
     string variable_name;
     int lex;
     Field* F;

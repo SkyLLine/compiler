@@ -47,7 +47,11 @@ void insert_table(TreeNode * tree, Field* field, string type)
     }
     field->table[i] = tree->variable_name;
     field->type[i] = type;
-    if(tree->array)field->id_type[i] = ID_ARRAY;
+    if(tree->array)
+    {
+        field->id_type[i] = ID_ARRAY;
+        field->dim[i] = tree->dim_num;
+    }
     else field->id_type[i] = ID_VAR;
     tree->type = type;
     field->size ++;
@@ -60,7 +64,16 @@ bool search_var(TreeNode * tree, Field* field)
       {
           for(int i = 0;i < field->size; i++)
           {
-              if(field->table[i] == tree->variable_name){tree->type = field->type[i];return true;}
+              if(field->table[i] == tree->variable_name)
+              {
+                  tree->type = field->type[i];
+                  if(field->id_type[i] == ID_ARRAY)
+                  {
+                      tree->dim_num = field->dim[i];
+                      tree->current_dim_num = field->dim[i];
+                  }
+                  return true;
+              }
           }
           field = field->father_field;
       }
@@ -183,6 +196,16 @@ string get_type(TreeNode* tree)
         }
         else if(tree->operatorType == OP_ARRAY_NUM)
         {
+            tree->current_dim_num = tree->child->current_dim_num - 1;
+            tree->type = "pointer";
+            if(tree->current_dim_num == 0)
+            {
+                TreeNode * tmp = tree;
+                while(tmp->child != nullptr)tmp = tmp->child;
+                tree->type = tmp->type;
+                return tree->type;
+            }
+            return tree->type;
         }
     }
     return "wrong";
@@ -193,23 +216,23 @@ void type_check(TreeNode* tree)
     if(tree == nullptr)return;
     if(tree->nodeType == NODE_EXPR)
     {
-        if(get_type(tree)=="wrong")cout<<"type error!"<<endl;
+        if(get_type(tree)=="wrong")cout<<"type error!"<<1<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_WHILE)
     {
-        if(get_type(tree->child)!="bool")cout<<"type error!"<<endl;
+        if(get_type(tree->child)!="bool")cout<<"type error!"<<2<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_FOR)
     {
-        if(get_type(tree->child)=="wrong"||get_type(tree->child->sibling)!="bool"||get_type(tree->child->child)=="wrong")cout<<"type error!"<<endl;
+        if(get_type(tree->child)=="wrong"||get_type(tree->child->sibling)!="bool"||get_type(tree->child->child)=="wrong")cout<<"type error!"<<3<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_IF_ELSE)
     {
-        if(get_type(tree->child)!="bool")cout<<"type error!"<<endl;
+        if(get_type(tree->child)!="bool")cout<<"type error!"<<4<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_IF)
     {
-        if(get_type(tree->child)!="bool")cout<<"type error!"<<endl;
+        if(get_type(tree->child)!="bool")cout<<"type error!"<<5<<endl;
     }
     TreeNode* tmp = tree->child;
     while(tmp != nullptr)
@@ -244,8 +267,10 @@ int main(int argc, char *argv[])
     // cout<<search_var("s", rootf);
     set_field(root, rootf);
     root->printAST();
+    
     // cout<<root->child->child->sibling->array_length[1]<<endl;
     type_check(root);
+    // cout<<root->child->sibling->child->child->type<<endl;
     // cout<<get_type()<<endl;
     return 0;
 }

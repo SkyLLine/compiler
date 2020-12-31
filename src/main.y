@@ -154,7 +154,7 @@ idlist
 variable 
     : IDENTIFIER{$$ = $1;}
     | IDENTIFIER LBRACK INTEGER RBRACK{$$ = $1;$$->array = true; $$->array_length[0] = $3->int_val;}
-    | variable LBRACK INTEGER RBRACK{$$ = $1;$$->array_length[$$->dim_num++]=$3->int_val;}
+    | variable LBRACK INTEGER RBRACK{$$ = $1;$$->array_length[$$->dim_num++]=$3->int_val;$$->current_dim_num++;}
     ;
 
 bool_expr
@@ -185,7 +185,7 @@ all_value
 expr
     : INTEGER{$$ = $1;}
     | all_value{$$ = $1;}
-    | IDENTIFIER LPAREN number_list RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($3);}
+    | IDENTIFIER LPAREN number_list RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($1);$$->addChild($3);}
     | LPAREN expr RPAREN{$$ = $2;}
     | expr MOD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MOD;$$->addChild($1);$$->addChild($3);}
     | expr MUL expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MUL;$$->addChild($1);$$->addChild($3);}
