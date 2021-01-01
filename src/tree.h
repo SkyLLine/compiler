@@ -140,12 +140,19 @@ struct TreeNode {
     static int current_node_id;
     bool array = false;
     bool func = false;
+    bool using_func = false;
     bool using_array = false;
     string func_name;
     int array_length[10];
     int dim_num = 1;
     int current_dim_num = 1;
     string variable_name;
+    int begin_label = -1;
+    int true_label = -1;
+    int false_label = -1;
+    int next_label = -1;
+    bool next_true = false;
+    bool next_false = false;
     int lex;
     Field* F;
 

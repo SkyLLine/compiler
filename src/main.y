@@ -90,7 +90,7 @@ field
     ;
 
 for_stmt 
-    : FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FOR;$$->addChild($3);$$->addChild($5);$$->addChild($7);$$->addChild($9);}
+    : FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field{$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_FOR;$$->addChild($3);$$->addChild($5);$$->addChild($7);$$->addChild($9);}
 
 assign_stmt
     : simple_instructions {$$ = new TreeNode(lineno, NODE_STMT);$$->addChild($1);$$->stmtType = STMT_ASSIGN;}

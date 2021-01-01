@@ -10,6 +10,8 @@ extern int yyparse();
 Field* rootf;
 using namespace std;
 
+int label_count = 0;
+
 Field* goto_father_field(Field* current)
 {
     return current->father_field;
@@ -96,6 +98,7 @@ void set_field(TreeNode * tree, Field* tmp_field)
             if(tmp->nodeType == NODE_FUNC)
             {
                 insert_table(tmp, rootf, tree->child->type);
+                tmp->func = true;
                 rootf->id_type[rootf->size - 1] = ID_FUNC;
             }
             if(tmp->nodeType == NODE_VAR)
@@ -149,7 +152,7 @@ string get_type(TreeNode* tree)
     if(tree->nodeType == NODE_VAR || tree->nodeType == NODE_CONST || tree->nodeType == NODE_FUNC)return tree->type;
     if(tree->nodeType == NODE_EXPR)
     {
-        if(tree->operatorType == OP_ADD ||tree->operatorType == OP_SUB ||tree->operatorType == OP_MUL ||tree->operatorType == OP_DIV ||tree->operatorType == OP_MOD ||tree->operatorType == OP_ASSIGN)//calculate
+        if(tree->operatorType == OP_ADD ||tree->operatorType == OP_SUB ||tree->operatorType == OP_MUL ||tree->operatorType == OP_DIV ||tree->operatorType == OP_MOD)//calculate
         {
             TreeNode* tmp = tree->child;
         while(tmp != nullptr && tmp->sibling != nullptr)
@@ -158,6 +161,23 @@ string get_type(TreeNode* tree)
             tmp = tmp->sibling;
         }
         if(tmp->type != "int")return "wrong";
+        tree->type = tmp->type;
+        return tree->type;
+        }
+        else if(tree->operatorType == OP_NEG || tree->operatorType == OP_POS)
+        {
+            TreeNode* tmp = tree->child;
+            if(tmp->type != "int")return "wrong";
+            return "int";
+        }
+        else if(tree->operatorType == OP_ASSIGN)
+        {
+            TreeNode* tmp = tree->child;
+        while(tmp != nullptr && tmp->sibling != nullptr)
+        {
+            if(get_type(tmp) != get_type(tmp->sibling)){return "wrong";}
+            tmp = tmp->sibling;
+        }
         tree->type = tmp->type;
         return tree->type;
         }
@@ -216,7 +236,7 @@ string get_type(TreeNode* tree)
                 if(tree->child->variable_name == rootf->table[i])
                 {
                     tree->child->type = rootf->type[i];
-                    tree->child->func = true;
+                    tree->child->using_func = true;
                     return tree->child->type;
                 }
             }
@@ -254,6 +274,124 @@ void type_check(TreeNode* tree)
     {
         type_check(tmp);
         tmp = tmp->sibling;
+    }
+}
+
+void recursive_get_label(TreeNode * tree);
+
+void stmt_get_label(TreeNode * tree)
+{
+    if(tree->stmtType == STMT_IF_ELSE)
+    {
+        TreeNode * tmp = tree->child;
+        TreeNode * tmp1 = tmp->sibling;
+        TreeNode * tmp2 = tmp1->sibling;
+        if(tree->begin_label == -1)tree->begin_label = label_count++;
+        tmp->true_label = label_count++;
+        tmp1->begin_label = tmp->true_label;
+        tmp->false_label = label_count++;
+        tmp2->begin_label = tmp->false_label;
+        if(tree->next_label == -1)tree->next_label = label_count++;
+        if(tree->sibling != nullptr)tree->sibling->begin_label = tree->next_label;
+        recursive_get_label(tmp);
+        recursive_get_label(tmp1);
+        recursive_get_label(tmp2);
+    }
+    else if(tree->stmtType == STMT_IF)
+    {
+        TreeNode * tmp = tree->child;
+        TreeNode * tmp1 = tmp->sibling;
+        if(tmp->begin_label == -1)tree->begin_label = label_count++;
+        tmp->true_label = label_count++;
+        tmp1->begin_label = tmp->true_label;
+        if(tree->next_label == -1)tree->next_label = label_count++;
+        tmp->false_label = tree->next_label;
+        if(tree->sibling != nullptr)tree->sibling->begin_label = tree->next_label;
+        recursive_get_label(tmp);
+        recursive_get_label(tmp1);
+    }
+    else if(tree->stmtType == STMT_WHILE)
+    {
+        TreeNode * tmp = tree->child;
+        TreeNode * tmp1 = tmp->sibling;
+        if(tree->begin_label == -1)tree->begin_label = label_count++;
+        tmp->true_label = label_count++;
+        tmp1->begin_label = tmp->true_label;
+        tmp1->next_label = tree->begin_label;
+        if(tree->next_label == -1)tree->next_label = label_count++;
+        tmp->false_label = tree->next_label;
+        if(tree->sibling != nullptr)tree->sibling->begin_label = tree->next_label;
+        recursive_get_label(tmp);
+        recursive_get_label(tmp1);
+    }
+    else if(tree->stmtType == STMT_FOR)
+    {
+        TreeNode *expr1 = tree->child;
+        TreeNode *expr2 = expr1->sibling;
+        TreeNode *expr3 = expr2->sibling;
+        TreeNode *stmt = expr3->sibling;
+        if(expr2->begin_label == -1)expr2->begin_label = label_count++;
+        expr2->true_label = label_count++;
+        stmt->begin_label = expr2->true_label;
+        stmt->next_label = expr2->begin_label;
+        if(tree->next_label == -1)tree->next_label = label_count++;
+        expr2->false_label = tree->next_label;
+        if(tree->sibling != nullptr)tree->sibling->begin_label = tree->next_label;
+        recursive_get_label(expr2);
+        recursive_get_label(expr1);
+        recursive_get_label(stmt);
+        recursive_get_label(expr3);
+    }
+    else
+    {
+        TreeNode *tmp = tree->child;
+        while(tmp != nullptr)
+        {
+            recursive_get_label(tmp);
+            tmp = tmp->sibling;
+        }
+    }
+    
+}
+
+void expr_get_label(TreeNode * tree)
+{
+    if(tree->type != "bool")return;
+    TreeNode *op1 = tree->child;
+    TreeNode *op2 = op1->sibling;
+    if(tree->operatorType == OP_LOG_AND)
+    {
+        op1->true_label = label_count++;
+        op2->true_label = tree->true_label;
+        op2->false_label = tree->false_label;
+        op1->false_label = op2->false_label;
+        op1->next_true = true;
+        op2->next_true = tree->next_true;
+        op2->next_false = tree->next_false;
+    }
+    else if(tree->operatorType == OP_LOG_OR)
+    {
+        op1->false_label  = label_count++;
+        op2->true_label = tree->true_label;
+        op2->false_label = tree->false_label;
+        op1->true_label = op2->true_label;
+        op1->next_false = true;
+        op2->next_true = tree->next_true;
+        op2->next_false = tree->next_false;
+    }
+}
+
+
+void recursive_get_label(TreeNode * tree)
+{
+    if(tree == nullptr)return;
+    else if(tree->nodeType == NODE_STMT)
+    {
+        stmt_get_label(tree);
+    }
+    else if(tree->nodeType == NODE_EXPR)
+    {
+
     }
 }
 

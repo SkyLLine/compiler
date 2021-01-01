@@ -66,7 +66,7 @@ Grammar
 
    23 field: LBRACE statements RBRACE
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
 
    25 assign_stmt: simple_instructions
 
@@ -267,7 +267,7 @@ Nonterminals, with rules where they appear
         on right: 24 25 35
     simple_instruction (76)
         on left: 37 38 39 40
-        on right: 35 36
+        on right: 24 35 36
     instructions (77)
         on left: 41 42
         on right: 34 41
@@ -358,7 +358,7 @@ State 2
 
 State 3
 
-   24 for_stmt: FOR . LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR . LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
 
     LPAREN  shift, and go to state 40
 
@@ -767,7 +767,7 @@ State 39
 
 State 40
 
-   24 for_stmt: FOR LPAREN . simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN . simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
 
     IDENTIFIER  shift, and go to state 13
     INTEGER     shift, and go to state 14
@@ -776,11 +776,10 @@ State 40
     SUB         shift, and go to state 18
     NOT         shift, and go to state 19
 
-    simple_instructions  go to state 85
-    simple_instruction   go to state 33
-    bool_expr            go to state 34
-    all_value            go to state 35
-    expr                 go to state 36
+    simple_instruction  go to state 85
+    bool_expr           go to state 34
+    all_value           go to state 35
+    expr                go to state 36
 
 
 State 41
@@ -1340,7 +1339,7 @@ State 84
 
 State 85
 
-   24 for_stmt: FOR LPAREN simple_instructions . SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction . SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field
 
     SEMICOLON  shift, and go to state 121
 
@@ -1804,7 +1803,7 @@ State 120
 
 State 121
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON . bool_expr SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON . bool_expr SEMICOLON simple_instructions RPAREN field
 
     IDENTIFIER  shift, and go to state 13
     INTEGER     shift, and go to state 14
@@ -2042,7 +2041,7 @@ State 140
 
 State 141
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr . SEMICOLON simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr . SEMICOLON simple_instructions RPAREN field
    55 bool_expr: bool_expr . LOG_AND bool_expr
    56          | bool_expr . LOG_OR bool_expr
 
@@ -2288,7 +2287,7 @@ State 159
 
 State 160
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON . simple_instructions RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON . simple_instructions RPAREN field
 
     IDENTIFIER  shift, and go to state 13
     INTEGER     shift, and go to state 14
@@ -2433,7 +2432,7 @@ State 171
 
 State 172
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions . RPAREN field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions . RPAREN field
 
     RPAREN  shift, and go to state 177
 
@@ -2468,7 +2467,7 @@ State 176
 
 State 177
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN . field
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN . field
 
     LBRACE  shift, and go to state 138
 
@@ -2484,6 +2483,6 @@ State 178
 
 State 179
 
-   24 for_stmt: FOR LPAREN simple_instructions SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field .
+   24 for_stmt: FOR LPAREN simple_instruction SEMICOLON bool_expr SEMICOLON simple_instructions RPAREN field .
 
     $default  reduce using rule 24 (for_stmt)
