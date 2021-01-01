@@ -1,162 +1,53 @@
-lineno 0 0 NODE_PROG child:  @1 @22
-lineno 9 1 NODE_STMT child:  @2 @3 @4 @7 @10
-lineno 4 2 NODE_TYPE  child: 
-lineno 4 3 NODE_FUNC  child: 
-lineno 4 4 NODE_STMT child:  @5 @6
-lineno 4 5 NODE_TYPE  child: 
-lineno 4 6 NODE_VAR aa child: 
-lineno 4 7 NODE_STMT child:  @8 @9
-lineno 4 8 NODE_TYPE  child: 
-lineno 4 9 NODE_VAR bb child: 
-lineno 9 10 NODE_STMT child:  @11 @15 @20
-lineno 6 11 NODE_STMT child:  @12 @13 @14
-lineno 6 12 NODE_CONST 0 child: 
-lineno 6 13 NODE_VAR aa child: 
-lineno 6 14 NODE_VAR bb child: 
-lineno 7 15 NODE_STMT child:  @16 @17
-lineno 7 16 NODE_TYPE  child: 
-lineno 7 17 NODE_EXPR 20 child:  @18 @19
-lineno 7 18 NODE_VAR d child: 
-lineno 7 19 NODE_VAR bb child: 
-lineno 8 20 NODE_STMT child:  @21
-lineno 8 21 NODE_CONST 0 child: 
-lineno 38 22 NODE_STMT child:  @23 @24 @25
-lineno 11 23 NODE_TYPE  child: 
-lineno 11 24 NODE_FUNC  child: 
-lineno 38 25 NODE_STMT child:  @26 @29 @32 @35 @43 @51 @59 @67 @70 @71 @76 @79 @160
-lineno 12 26 NODE_STMT child:  @27 @28
-lineno 12 27 NODE_TYPE  child: 
-lineno 12 28 NODE_VAR s child: 
-lineno 13 29 NODE_STMT child:  @30 @31
-lineno 13 30 NODE_TYPE  child: 
-lineno 13 31 NODE_VAR c child: 
-lineno 14 32 NODE_STMT child:  @33 @34
-lineno 14 33 NODE_TYPE  child: 
-lineno 14 34 NODE_VAR a child: 
-lineno 15 35 NODE_STMT child:  @36
-lineno 15 36 NODE_EXPR 20 child:  @37 @42
-lineno 15 37 NODE_EXPR 8 child:  @38 @41
-lineno 15 38 NODE_EXPR 8 child:  @39 @40
-lineno 15 39 NODE_VAR a child: 
-lineno 15 40 NODE_CONST 0 child: 
-lineno 15 41 NODE_CONST 1 child: 
-lineno 15 42 NODE_CONST 10 child: 
-lineno 16 43 NODE_STMT child:  @44
-lineno 16 44 NODE_EXPR 20 child:  @45 @50
-lineno 16 45 NODE_EXPR 8 child:  @46 @49
-lineno 16 46 NODE_EXPR 8 child:  @47 @48
-lineno 16 47 NODE_VAR a child: 
-lineno 16 48 NODE_CONST 3 child: 
-lineno 16 49 NODE_CONST 1 child: 
-lineno 16 50 NODE_CONST 5 child: 
-lineno 17 51 NODE_STMT child:  @52
-lineno 17 52 NODE_EXPR 20 child:  @53 @54
-lineno 17 53 NODE_VAR c child: 
-lineno 17 54 NODE_EXPR 8 child:  @55 @58
-lineno 17 55 NODE_EXPR 8 child:  @56 @57
-lineno 17 56 NODE_VAR a child: 
-lineno 17 57 NODE_CONST 1 child: 
-lineno 17 58 NODE_CONST 1 child: 
-lineno 18 59 NODE_STMT child:  @60
-lineno 18 60 NODE_EXPR 20 child:  @61 @62
-lineno 18 61 NODE_VAR s child: 
-lineno 18 62 NODE_EXPR 8 child:  @63 @66
-lineno 18 63 NODE_EXPR 8 child:  @64 @65
-lineno 18 64 NODE_VAR a child: 
-lineno 18 65 NODE_CONST 2 child: 
-lineno 18 66 NODE_CONST 3 child: 
-lineno 19 67 NODE_STMT child:  @68 @69
-lineno 19 68 NODE_TYPE  child: 
-lineno 19 69 NODE_VAR ch child: 
-lineno 20 70 NODE_STMT child: 
-lineno 21 71 NODE_STMT child:  @72 @73
-lineno 21 72 NODE_TYPE  child: 
-lineno 21 73 NODE_EXPR 20 child:  @74 @75
-lineno 21 74 NODE_VAR b child: 
-lineno 21 75 NODE_CONST 10 child: 
-lineno 22 76 NODE_STMT child:  @77 @78
-lineno 22 77 NODE_CONST 0 child: 
-lineno 22 78 NODE_VAR ch child: 
-lineno 36 79 NODE_STMT child:  @80 @97
-lineno 24 80 NODE_EXPR 14 child:  @81 @88
-lineno 24 81 NODE_EXPR 10 child:  @82 @87
-lineno 24 82 NODE_EXPR 8 child:  @83 @86
-lineno 24 83 NODE_EXPR 8 child:  @84 @85
-lineno 24 84 NODE_VAR a child: 
-lineno 24 85 NODE_CONST 0 child: 
-lineno 24 86 NODE_CONST 1 child: 
-lineno 24 87 NODE_CONST 0 child: 
-lineno 24 88 NODE_EXPR 15 child:  @89 @92
-lineno 24 89 NODE_EXPR 12 child:  @90 @91
-lineno 24 90 NODE_VAR s child: 
-lineno 24 91 NODE_CONST 20 child: 
-lineno 24 92 NODE_EXPR 6 child:  @93 @96
-lineno 24 93 NODE_EXPR 5 child:  @94 @95
-lineno 24 94 NODE_VAR s child: 
-lineno 24 95 NODE_CONST 100 child: 
-lineno 24 96 NODE_CONST 99 child: 
-lineno 36 97 NODE_STMT child:  @98 @109 @123 @130 @139 @144
-lineno 28 98 NODE_STMT child:  @99 @106
-lineno 25 99 NODE_EXPR 10 child:  @100 @105
-lineno 25 100 NODE_EXPR 8 child:  @101 @104
-lineno 25 101 NODE_EXPR 8 child:  @102 @103
-lineno 25 102 NODE_VAR a child: 
-lineno 25 103 NODE_CONST 0 child: 
-lineno 25 104 NODE_CONST 1 child: 
-lineno 25 105 NODE_CONST 0 child: 
-lineno 27 106 NODE_STMT child:  @107
-lineno 26 107 NODE_STMT child:  @108
-lineno 26 108 NODE_CONST 0 child: 
-lineno 28 109 NODE_STMT child:  @110
-lineno 28 110 NODE_EXPR 20 child:  @111 @116
-lineno 28 111 NODE_EXPR 8 child:  @112 @115
-lineno 28 112 NODE_EXPR 8 child:  @113 @114
-lineno 28 113 NODE_VAR a child: 
-lineno 28 114 NODE_CONST 0 child: 
-lineno 28 115 NODE_CONST 1 child: 
-lineno 28 116 NODE_EXPR 2 child:  @117 @122
-lineno 28 117 NODE_EXPR 8 child:  @118 @121
-lineno 28 118 NODE_EXPR 8 child:  @119 @120
-lineno 28 119 NODE_VAR a child: 
-lineno 28 120 NODE_CONST 0 child: 
-lineno 28 121 NODE_CONST 1 child: 
-lineno 28 122 NODE_CONST 1 child: 
-lineno 29 123 NODE_STMT child:  @124 @125
-lineno 29 124 NODE_CONST 0 child: 
-lineno 29 125 NODE_EXPR 8 child:  @126 @129
-lineno 29 126 NODE_EXPR 8 child:  @127 @128
-lineno 29 127 NODE_VAR a child: 
-lineno 29 128 NODE_CONST 0 child: 
-lineno 29 129 NODE_CONST 1 child: 
-lineno 31 130 NODE_STMT child:  @131 @132
-lineno 31 131 NODE_TYPE  child: 
-lineno 31 132 NODE_EXPR 20 child:  @133 @134
-lineno 31 133 NODE_VAR i child: 
-lineno 31 134 NODE_EXPR 8 child:  @135 @138
-lineno 31 135 NODE_EXPR 8 child:  @136 @137
-lineno 31 136 NODE_VAR a child: 
-lineno 31 137 NODE_CONST 1 child: 
-lineno 31 138 NODE_CONST 2 child: 
-lineno 32 139 NODE_STMT child:  @140 @141
-lineno 32 140 NODE_TYPE  child: 
-lineno 32 141 NODE_EXPR 20 child:  @142 @143
-lineno 32 142 NODE_VAR b child: 
-lineno 32 143 NODE_CONST 10 child: 
-lineno 35 144 NODE_STMT child:  @145 @148 @151 @156
-lineno 33 145 NODE_EXPR 20 child:  @146 @147
-lineno 33 146 NODE_VAR i child: 
-lineno 33 147 NODE_CONST 0 child: 
-lineno 33 148 NODE_EXPR 12 child:  @149 @150
-lineno 33 149 NODE_VAR i child: 
-lineno 33 150 NODE_VAR b child: 
-lineno 33 151 NODE_EXPR 20 child:  @152 @153
-lineno 33 152 NODE_VAR i child: 
-lineno 33 153 NODE_EXPR 1 child:  @154 @155
-lineno 33 154 NODE_VAR i child: 
-lineno 33 155 NODE_CONST 1 child: 
-lineno 35 156 NODE_STMT child:  @157
-lineno 34 157 NODE_STMT child:  @158 @159
-lineno 34 158 NODE_CONST 0 child: 
-lineno 34 159 NODE_VAR i child: 
-lineno 37 160 NODE_STMT child:  @161
-lineno 37 161 NODE_CONST 0 child: 
+lineno 0 0 NODE_PROG child:  @1 @6
+lineno 1 1 NODE_STMT child:  @2 @3
+lineno 1 2 NODE_TYPE  child: 
+lineno 1 3 NODE_EXPR 20 child:  @4 @5
+lineno 1 4 NODE_VAR a child: 
+lineno 1 5 NODE_CONST 10 child: 
+lineno 12 6 NODE_STMT child:  @7 @8 @9
+lineno 2 7 NODE_TYPE  child: 
+lineno 2 8 NODE_FUNC  child: 
+lineno 12 9 NODE_STMT child:  @10 @13 @17 @20 @48 @51
+lineno 3 10 NODE_STMT child:  @11 @12
+lineno 3 11 NODE_TYPE  child: 
+lineno 3 12 NODE_VAR a child: 
+lineno 4 13 NODE_STMT child:  @14
+lineno 4 14 NODE_EXPR 20 child:  @15 @16
+lineno 4 15 NODE_VAR a child: 
+lineno 4 16 NODE_CONST 1 child: 
+lineno 5 17 NODE_STMT child:  @18 @19
+lineno 5 18 NODE_TYPE  child: 
+lineno 5 19 NODE_VAR i child: 
+lineno 9 20 NODE_STMT child:  @21 @24 @27 @32
+lineno 6 21 NODE_EXPR 20 child:  @22 @23
+lineno 6 22 NODE_VAR i child: 
+lineno 6 23 NODE_CONST 0 child: 
+lineno 6 24 NODE_EXPR 12 child:  @25 @26
+lineno 6 25 NODE_VAR i child: 
+lineno 6 26 NODE_CONST 10 child: 
+lineno 6 27 NODE_EXPR 20 child:  @28 @29
+lineno 6 28 NODE_VAR i child: 
+lineno 6 29 NODE_EXPR 1 child:  @30 @31
+lineno 6 30 NODE_VAR i child: 
+lineno 6 31 NODE_CONST 1 child: 
+lineno 9 32 NODE_STMT child:  @33 @44
+lineno 7 33 NODE_STMT child:  @34 @35
+lineno 7 34 NODE_TYPE  child: 
+lineno 7 35 NODE_EXPR 20 child:  @36 @37
+lineno 7 36 NODE_VAR a child: 
+lineno 7 37 NODE_EXPR 1 child:  @38 @41
+lineno 7 38 NODE_EXPR 3 child:  @39 @40
+lineno 7 39 NODE_VAR i child: 
+lineno 7 40 NODE_CONST 10 child: 
+lineno 7 41 NODE_EXPR 5 child:  @42 @43
+lineno 7 42 NODE_VAR i child: 
+lineno 7 43 NODE_CONST 3 child: 
+lineno 8 44 NODE_STMT child:  @45 @46 @47
+lineno 8 45 NODE_CONST 0 child: 
+lineno 8 46 NODE_VAR i child: 
+lineno 8 47 NODE_VAR a child: 
+lineno 10 48 NODE_STMT child:  @49 @50
+lineno 10 49 NODE_CONST 0 child: 
+lineno 10 50 NODE_VAR a child: 
+lineno 11 51 NODE_STMT child:  @52
+lineno 11 52 NODE_CONST 0 child: 
