@@ -1855,7 +1855,7 @@ yyreduce:
 
   case 61:
 #line 178 "src/main.y"
-                                  {yyval = new TreeNode(lineno, NODE_EXPR);yyval->operatorType = OP_ARRAY_NUM;yyval->addChild(yyvsp[-3]);yyval->addChild(yyvsp[-1]);}
+                                  {yyval = new TreeNode(lineno, NODE_EXPR);yyval->operatorType = OP_ARRAY_NUM;yyvsp[-3]->using_array = true;yyval->addChild(yyvsp[-3]);yyval->addChild(yyvsp[-1]);}
 #line 1860 "src/main.tab.cpp"
     break;
 
@@ -1891,7 +1891,7 @@ yyreduce:
 
   case 67:
 #line 188 "src/main.y"
-                                          {yyval = new TreeNode(lineno, NODE_EXPR);yyval->operatorType = OP_FUNC;yyval->func_name = yyvsp[-3]->variable_name;yyval->addChild(yyvsp[-1]);}
+                                          {yyval = new TreeNode(lineno, NODE_EXPR);yyval->operatorType = OP_FUNC;yyval->func_name = yyvsp[-3]->variable_name;yyval->addChild(yyvsp[-3]);yyval->addChild(yyvsp[-1]);}
 #line 1896 "src/main.tab.cpp"
     break;
 

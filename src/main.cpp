@@ -71,6 +71,7 @@ bool search_var(TreeNode * tree, Field* field)
                   {
                       tree->dim_num = field->dim[i];
                       tree->current_dim_num = field->dim[i];
+                      tree->using_array = true;
                   }
                   return true;
               }
@@ -144,6 +145,7 @@ void set_field(TreeNode * tree, Field* tmp_field)
 
 string get_type(TreeNode* tree)
 {
+    if(tree->nodeType == NODE_VAR && tree->using_array == true){return "pointer";}
     if(tree->nodeType == NODE_VAR || tree->nodeType == NODE_CONST || tree->nodeType == NODE_FUNC)return tree->type;
     if(tree->nodeType == NODE_EXPR)
     {
@@ -206,6 +208,19 @@ string get_type(TreeNode* tree)
                 return tree->type;
             }
             return tree->type;
+        }
+        else if(tree->operatorType == OP_FUNC)
+        {
+            for(int i = 0;i < rootf->size; i++)
+            {
+                if(tree->child->variable_name == rootf->table[i])
+                {
+                    tree->child->type = rootf->type[i];
+                    tree->child->func = true;
+                    return tree->child->type;
+                }
+            }
+            return "wrong";
         }
     }
     return "wrong";
@@ -272,6 +287,7 @@ int main(int argc, char *argv[])
     type_check(root);
     // cout<<root->child->sibling->child->child->type<<endl;
     // cout<<get_type()<<endl;
+    // cout<<root->child->sibling->child->child->sibling->dim_num;
     return 0;
 }
 

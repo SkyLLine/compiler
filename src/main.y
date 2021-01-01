@@ -175,11 +175,11 @@ all_values
     | all_value {$$ = $1;}
 
 all_value
-    : all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$$->addChild($1);$$->addChild($3);}
+    : all_value LBRACK expr RBRACK{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_ARRAY_NUM;$1->using_array = true;$$->addChild($1);$$->addChild($3);}
     | all_value POINT IDENTIFIER{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_STRUCT_MEMBER;$$->addChild($1);$$->addChild($3);}
     | IDENTIFIER{$$ = $1;}
     | LPAREN all_value RPAREN{$$ = $2;}
-       ;
+    ;
 
 
 expr

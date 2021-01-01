@@ -140,6 +140,7 @@ struct TreeNode {
     static int current_node_id;
     bool array = false;
     bool func = false;
+    bool using_array = false;
     string func_name;
     int array_length[10];
     int dim_num = 1;
