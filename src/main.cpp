@@ -466,7 +466,33 @@ void stmt_gen_code(TreeNode * tree)
 {
     if(tree->stmtType == STMT_WHILE)
     {
-
+        if(tree->begin_label != -1)
+        {
+            cout<<"L"<<tree->begin_label<<":"<<endl;
+        }
+        recursive_gen_code(tree->child);
+        cout<<"L"<<tree->child->true_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling);
+        cout<<"jmp L"<<tree->begin_label<<endl;
+        cout<<"L"<<tree->next_label<<":"<<endl;
+    }
+    else if(tree->stmtType == STMT_IF_ELSE)
+    {}
+    else if(tree->stmtType == STMT_IF)
+    {}
+    else if(tree->stmtType == STMT_FOR)
+    {}
+    else if(tree->stmtType == STMT_SCF)
+    {}
+    else if(tree->stmtType == STMT_PRTF)
+    {}
+    else if(tree->stmtType == STMT_FUNC_DECL)
+    {}
+    else if(tree->stmtType == STMT_RET)
+    {}
+    else
+    {
+        /* code */
     }
 }
 
