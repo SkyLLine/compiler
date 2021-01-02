@@ -1095,8 +1095,8 @@ YY_RULE_SETUP
 #line 111 "src/main.lex"
 {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
-    int i = 1;
-    for(;yytext[i]!='\"';i++)
+    int i = 0;
+    for(;yytext[i]!='\0';i++)
         node->string_val += (char)yytext[i];
     node->constType = CON_STRING;
     node->type = "string";

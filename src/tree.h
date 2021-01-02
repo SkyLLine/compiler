@@ -97,8 +97,10 @@ struct Field {
     Field* son_field = nullptr;
     Field* sibling_field = nullptr;
     int size = 0;
+    int field_size = 0;
     string table[100];
     string type[100];
+    int offs[100];
     int dim[100];
     ID_Type id_type[100];
 
@@ -154,6 +156,8 @@ struct TreeNode {
     bool next_true = false;
     bool next_false = false;
     int lex;
+    int define_place;
+    int offset = 0;
     Field* F;
 
     string Node2String();

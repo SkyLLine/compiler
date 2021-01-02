@@ -184,6 +184,7 @@ all_value
 
 expr
     : INTEGER{$$ = $1;}
+    | CHAR{$$ = $1;}
     | all_value{$$ = $1;}
     | IDENTIFIER LPAREN number_list RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($1);$$->addChild($3);}
     | LPAREN expr RPAREN{$$ = $2;}

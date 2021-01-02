@@ -10,7 +10,14 @@ extern int yyparse();
 Field* rootf;
 using namespace std;
 
+string con_string[50000];
+int string_count = 0;
 int label_count = 0;
+
+int global_offset = 0;
+int func_count = 0;
+int func_size[5000] ={0};
+
 
 Field* goto_father_field(Field* current)
 {
@@ -53,10 +60,28 @@ void insert_table(TreeNode * tree, Field* field, string type)
     {
         field->id_type[i] = ID_ARRAY;
         field->dim[i] = tree->dim_num;
+        int l = 1;
+        int pos = tree->dim_num;
+        for(int i = 0; i < pos; i++)l = l * tree->array_length[i];
+        l *= 4;
+        tree->offset = -global_offset;
+        field->offs[i] = -global_offset;
+        global_offset += l;
+
     }
-    else field->id_type[i] = ID_VAR;
+    else if(tree->func)
+    {
+        field->id_type[i] = ID_FUNC;
+    }
+    else
+    {
+        field->id_type[i] = ID_VAR;
+        global_offset += 4;
+        field->offs[i] = -global_offset;
+        tree->offset = -global_offset;
+    }
     tree->type = type;
-    field->size ++;
+    field->size++;
     return;
 }
 
@@ -74,7 +99,14 @@ bool search_var(TreeNode * tree, Field* field)
                       tree->dim_num = field->dim[i];
                       tree->current_dim_num = field->dim[i];
                       tree->using_array = true;
+                      tree->offset = field->offs[i];
                   }
+                  else if(field->id_type[i] == ID_FUNC)
+                  {
+                      tree->using_func = true;
+                      tree->define_place = i;
+                  }
+                  else tree->offset = field->offs[i];
                   return true;
               }
           }
@@ -84,10 +116,18 @@ bool search_var(TreeNode * tree, Field* field)
 }
 void set_field(TreeNode * tree, Field* tmp_field)
 {
+    
     if(tree == nullptr)return;
+    if(tree->nodeType == NODE_CONST && tree->constType == CON_STRING)
+    {
+        tree->define_place = string_count;
+        con_string[string_count++] = tree->string_val;
+    }
     if(tree->stmtType == STMT_FUNC_DECL || tree->stmtType == STMT_FIELD)
     {
         tmp_field = goto_son_field(tmp_field);
+        func_size[func_count] = global_offset;
+        if(tree->stmtType = STMT_FUNC_DECL)global_offset = 0;
     }
     if(tree->child != nullptr &&(tree->child->nodeType == NODE_TYPE))
     {
@@ -97,8 +137,8 @@ void set_field(TreeNode * tree, Field* tmp_field)
         {
             if(tmp->nodeType == NODE_FUNC)
             {
-                insert_table(tmp, rootf, tree->child->type);
                 tmp->func = true;
+                insert_table(tmp, rootf, tree->child->type);
                 rootf->id_type[rootf->size - 1] = ID_FUNC;
             }
             if(tmp->nodeType == NODE_VAR)
@@ -110,6 +150,8 @@ void set_field(TreeNode * tree, Field* tmp_field)
             if(tmp->nodeType == NODE_EXPR)
             {
                 insert_table(tmp->child, tmp_field, tree->child->type);
+                global_offset += 4;
+                tmp->child->offset = -global_offset;
                 // cerr<<tmp->child->variable_name<<" "<<tmp_field->field_id<<endl;
                 // cerr<<tmp_field->size<<endl;
             }
@@ -119,6 +161,7 @@ void set_field(TreeNode * tree, Field* tmp_field)
     else if(tree->nodeType == NODE_VAR)
     {
         if(!search_var(tree, tmp_field))cout<<"not declared yet"<<endl;
+
     }
     TreeNode *son = tree->child;
     while(son != nullptr)
@@ -161,13 +204,18 @@ string get_type(TreeNode* tree)
             tmp = tmp->sibling;
         }
         if(tmp->type != "int")return "wrong";
+        global_offset += 4;
+        tree->offset = -global_offset;
         tree->type = tmp->type;
         return tree->type;
         }
         else if(tree->operatorType == OP_NEG || tree->operatorType == OP_POS)
         {
             TreeNode* tmp = tree->child;
-            if(tmp->type != "int")return "wrong";
+            if(get_type(tmp) != "int")return "wrong";
+            tree->type = "int";
+            global_offset += 4;
+            tree->offset = -global_offset;
             return "int";
         }
         else if(tree->operatorType == OP_ASSIGN)
@@ -179,6 +227,8 @@ string get_type(TreeNode* tree)
             tmp = tmp->sibling;
         }
         tree->type = tmp->type;
+        // global_offset += 4;
+        // tree->offset = global_offset;
         return tree->type;
         }
         else if(tree->operatorType == OP_EQ ||tree->operatorType == OP_NE)
@@ -190,6 +240,8 @@ string get_type(TreeNode* tree)
             tmp = tmp->sibling;
         }
         tree->type = "bool";
+        global_offset += 4;
+        tree->offset = -global_offset;
         return tree->type;
         }
         else if(tree->operatorType == OP_GT ||tree->operatorType == OP_LT ||tree->operatorType == OP_GE ||tree->operatorType == OP_LE)//bool calculate
@@ -202,6 +254,8 @@ string get_type(TreeNode* tree)
         }
         if(tmp->type != "int")return "wrong";
         tree->type = "bool";
+        global_offset += 4;
+        tree->offset = -global_offset;
         return tree->type;
         }
         else if(tree->operatorType == OP_LOG_AND || tree->operatorType == OP_LOG_OR)
@@ -214,6 +268,8 @@ string get_type(TreeNode* tree)
         }
         if(tmp->type != "bool")return "wrong";
         tree->type = "bool";
+        global_offset += 4;
+        tree->offset = -global_offset;
         return tree->type;
         }
         else if(tree->operatorType == OP_ARRAY_NUM)
@@ -379,6 +435,15 @@ void expr_get_label(TreeNode * tree)
         op2->next_true = tree->next_true;
         op2->next_false = tree->next_false;
     }
+    else if(tree->operatorType == OP_NOT)
+    {
+         op1->false_label = tree->true_label;
+        op1->true_label = tree->false_label;
+        op1->next_true = tree->next_true;
+        op1->next_false = tree->next_false;
+    }
+    recursive_get_label(op1);
+    recursive_get_label(op2);
 }
 
 
@@ -393,6 +458,249 @@ void recursive_get_label(TreeNode * tree)
     {
 
     }
+}
+
+// void recursive_gen_code(TreeNode * tree);
+
+// void stmt_gen_code(TreeNode * tree)
+// {
+//     if(tree->stmtType == STMT_WHILE)
+//     {
+
+//     }
+// }
+
+
+// void expr_gen_code(TreeNode * tree)
+// {
+//     if(tree->using_func == true)
+//     {
+//         //todo!!!
+//     }
+//     recursive_gen_code(tree->child);
+//     recursive_gen_code(tree->child->sibling);
+//     TreeNode * op1 = tree->child;
+//     TreeNode * op2 = op1->sibling;
+//     if(tree->operatorType == OP_NEG || tree->operatorType == OP_POS || tree->operatorType == OP_ADD ||tree->operatorType == OP_SUB ||tree->operatorType == OP_MUL ||tree->operatorType == OP_DIV ||tree->operatorType == OP_MOD ||tree->operatorType == OP_LE ||tree->operatorType == OP_GE ||tree->operatorType == OP_GT ||tree->operatorType == OP_LT ||tree->operatorType == OP_EQ ||tree->operatorType == OP_NE)
+//     {
+//         if(op1->nodeType == NODE_VAR)
+//         {
+//             cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
+//         }
+//         else if(op1->nodeType == NODE_CONST)
+//         {
+//             if(op1->type == "int")
+//             {
+//                 cout<<"movl $"<<op1->int_val<<" , %eax"<<endl;
+//             }
+//             if(op1->type == "char")
+//             {
+                
+//             }
+//         }
+//         else if(op1->nodeType == NODE_EXPR)
+//         {
+//             if(op1->operatorType == OP_ARRAY_NUM)
+//             {
+//                 cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
+//                 cout<<"addl %ebp, %eax"<<endl<<"movl 0(%eax), %eax"<<endl;
+//             }
+//             else cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
+//         }
+//         if(op2 != nullptr)
+//         {
+//             if(op2->nodeType == NODE_VAR)
+//             {
+//                 cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//             }
+//             else if(op2->nodeType == NODE_CONST)
+//             {
+//                 if(op2->type == "int")
+//                 {
+//                     cout<<"movl $"<<op2->int_val<<" , %eax"<<endl;
+//                 }
+//                 if(op2->type == "char")
+//                 {
+
+//                 }
+//             }
+//             else if(op2->nodeType == NODE_EXPR)
+//             {
+//                 if(op2->operatorType == OP_ARRAY_NUM)
+//                 {
+//                     cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//                     cout<<"addl %ebp, %eax"<<endl<<"movl 0(%eax), %ebx"<<endl;
+//                 }
+//                 else cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//             }
+//         }
+//         if(tree->operatorType == OP_ADD)
+//         {
+//             if(op2 != nullptr)
+//             {
+//                 cout<<"addl %ebx, %eax"<<endl;
+//                 cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl; 
+//             }
+//             else
+//             {
+//                 cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//             }
+//         }
+//         else if(tree->operatorType == OP_POS)
+//         {
+//             cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//         }
+//         else if(tree->operatorType == OP_SUB)
+//         {
+//             if(op2 != nullptr)
+//             {
+//                 cout<<"subl %ebx, %eax"<<endl;
+//                 cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//             }
+//             else
+//             {
+//                 cout<<"movl $0, %ebx"<<endl;
+//                 cout<<"subl %eax, %ebx"<<endl;
+//                 cout<<"movl %ebx, "<<tree->offset<<"(%ebp)"<<endl;
+//             }
+//         }
+//         else if(tree->operatorType == OP_NEG)
+//         {
+//             cout<<"movl $0, %ebx"<<endl;
+//             cout<<"subl %eax, %ebx"<<endl;
+//             cout<<"movl %ebx, "<<tree->offset<<"(%ebp)"<<endl;   
+//         }
+//         else if(tree->operatorType == OP_MUL)
+//         {
+//             cout<<"imull %ebx, %eax"<<endl;
+//             cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//         }
+//         else if(tree->operatorType == OP_DIV)
+//         {
+//             cout<<"movl $0, %edx"<<endl<<"idivl %ebx"<<endl;
+//             cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//         }
+//         else if(tree->operatorType == OP_MOD)
+//         {
+//             cout<<"movl $0, %edx"<<endl<<"idivl %ebx"<<endl;
+//             cout<<"movl %edx, "<<tree->offset<<"(%ebp)"<<endl;
+//         }
+//         else if(tree->operatorType == OP_GT)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"jg L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//         else if(tree->operatorType == OP_LT)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"jl L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//         else if(tree->operatorType == OP_GE)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"jg3 L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//         else if(tree->operatorType == OP_LE)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"jle L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//         else if(tree->operatorType == OP_EQ)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"je L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//         else if(tree->operatorType == OP_NE)
+//         {
+//             cout<<"cmp %ebx, %eax"<<endl;
+//             cout<<"jne L"<<tree->true_label<<endl;
+//             cout<<"jmp L"<<tree->false_label<<endl;
+//             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
+//             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
+//         }
+//     }
+//     else if(tree->operatorType == OP_ARRAY_NUM)
+//     {
+//         if(op1->nodeType == NODE_VAR)
+//         {
+//             cout<<"movl $"<<op1->offset<<", %eax"<<endl;
+//         }
+//         else if(op1->nodeType == NODE_EXPR)
+//         {
+//             cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
+//         }
+//         if(op2->nodeType == NODE_VAR)
+//         {
+//             cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//         }
+//         if(op2->nodeType == NODE_CONST)
+//         {
+//             cout<<"movl $"<<op2->int_val<<", %ebx"<<endl;
+//         }
+//         if(op2->nodeType == NODE_EXPR)
+//         {
+//             if(op2->operatorType == OP_ARRAY_NUM)
+//             {
+//                 cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//                 cout<<"addl %ebp, %ebx"<<endl<<"movl 0(%ebx), %ebx"<<endl;
+//             }
+//             else
+//             {
+//                 cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+//             }   
+//         }
+//         cout<<"imull $"<<caltypesize(op1type)<<", %ebx, %ebx"<<endl;//NEED TO FIX array!
+//         cout<<"addl %ebx, %eax"<<endl;
+//         cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
+//     }
+//     else if(tree->operatorType == OP_ASSIGN)
+//     {
+//         if(op1->nodeType == NODE_VAR)
+//         {
+//             cout<<"movl $"<<op1->offset<<", %eax"<<endl;
+//         }
+//         else if(op1->nodeType == NODE_EXPR)
+//         {
+//             cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
+//         }
+//         if(op2->nodeType == NODE_VAR)
+//         {
+//             cout<<"movl $"<<op2->offset<<", %ebx"<<endl;
+//         }
+//         else if(op2->nodeType == NODE_CONST)
+//         {
+//             if(op2->constType == CON_INT)
+//             {
+//                 //TO DO!!!!!!!!!!!!!!!!!
+//             }
+//         }
+//         else if(op2->nodeType == NODE_EXPR)
+//         {
+            
+//         }
+//     }
+// }
+
+
+
+void gen_code()
+{
+    recursive_get_label(root);
 }
 
 int main(int argc, char *argv[])
@@ -419,10 +727,13 @@ int main(int argc, char *argv[])
     rootf = new Field();
     // cout<<search_var("s", rootf);
     set_field(root, rootf);
+    type_check(root);
     root->printAST();
     
     // cout<<root->child->child->sibling->array_length[1]<<endl;
-    type_check(root);
+    
+    // gen_code();
+    
     // cout<<root->child->sibling->child->child->type<<endl;
     // cout<<get_type()<<endl;
     // cout<<root->child->sibling->child->child->sibling->dim_num;

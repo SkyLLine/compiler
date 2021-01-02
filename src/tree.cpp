@@ -64,11 +64,11 @@ void TreeNode::printNodeInfo()
 {
         cout<<"lineno "<<lineno<<" ";
     cout<<nodeID<<" ";
-    if(nodeType == 1)cout<<"NODE_CONST "<<int_val;
-    if(nodeType == 2)cout<<"NODE_VAR "<<variable_name;
-    if(nodeType == 3)cout<<"NODE_EXPR "<<operatorType;
+    if(nodeType == 1)cout<<"NODE_CONST "<<int_val<<" "<<char_val;
+    if(nodeType == 2)cout<<"NODE_VAR "<<offset<<" "<<variable_name;
+    if(nodeType == 3)cout<<"NODE_EXPR "<<offset;
     if(nodeType == 4)cout<<"NODE_TYPE ";
-    if(nodeType == 5)cout<<"NODE_STMT";
+    if(nodeType == 5)cout<<"NODE_STMT"<<stmtType;
     if(nodeType == 6)cout<<"NODE_PROG";
     if(nodeType == 7)cout<<"NODE_FUNC ";
     if(nodeType == 8)cout<<"NODE_NONE";
