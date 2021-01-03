@@ -102,6 +102,7 @@ IDENTIFIER [[:alpha:]_][[:alpha:][:digit:]_]*
 {CHAR} {
     TreeNode* node = new TreeNode(lineno, NODE_CONST);
     node->char_val = yytext[1];
+    node->int_val = node->char_val;
     node->constType = CON_CHAR;
     node->type = "char";
     yylval = node;

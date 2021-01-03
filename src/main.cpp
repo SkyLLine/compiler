@@ -64,7 +64,7 @@ void insert_table(TreeNode * tree, Field* field, string type)
         int pos = tree->dim_num;
         for(int i = 0; i < pos; i++)l = l * tree->array_length[i];
         l *= 4;
-        tree->offset = -global_offset;
+        tree->offset = -global_offset - 4;
         field->offs[i] = -global_offset;
         global_offset += l;
 
@@ -127,7 +127,7 @@ void set_field(TreeNode * tree, Field* tmp_field)
     {
         tmp_field = goto_son_field(tmp_field);
         func_size[func_count] = global_offset;
-        if(tree->stmtType = STMT_FUNC_DECL)global_offset = 0;
+        if(tree->stmtType == STMT_FUNC_DECL)global_offset = 0;
     }
     if(tree->child != nullptr &&(tree->child->nodeType == NODE_TYPE))
     {
@@ -276,6 +276,8 @@ string get_type(TreeNode* tree)
         {
             tree->current_dim_num = tree->child->current_dim_num - 1;
             tree->type = "pointer";
+            global_offset += 4;
+            tree->offset = -global_offset;
             if(tree->current_dim_num == 0)
             {
                 TreeNode * tmp = tree;
@@ -291,6 +293,8 @@ string get_type(TreeNode* tree)
             {
                 if(tree->child->variable_name == rootf->table[i])
                 {
+                    global_offset += 4;
+                    tree->offset = -global_offset;
                     tree->child->type = rootf->type[i];
                     tree->child->using_func = true;
                     return tree->child->type;
@@ -477,11 +481,47 @@ void stmt_gen_code(TreeNode * tree)
         cout<<"L"<<tree->next_label<<":"<<endl;
     }
     else if(tree->stmtType == STMT_IF_ELSE)
-    {}
+    {
+        if(tree->begin_label != -1)
+        {
+            cout<<"L"<<tree->begin_label<<":"<<endl;
+        }
+        recursive_gen_code(tree->child);
+        cout<<"L"<<tree->child->true_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling);
+        cout<<"jmp L"<<tree->next_label<<endl;
+        if(tree->child->false_label != -1)
+            cout<<"L"<<tree->child->false_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling->sibling);
+        cout<<"L"<<tree->next_label<<":"<<endl;
+    }
     else if(tree->stmtType == STMT_IF)
-    {}
+    {
+        if(tree->begin_label != -1)
+        {
+            cout<<"L"<<tree->begin_label<<":"<<endl;
+        }
+        recursive_gen_code(tree->child);
+        cout<<"L"<<tree->child->true_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling);
+        cout<<"jmp L"<<tree->next_label<<endl;
+        cout<<"L"<<tree->next_label<<":"<<endl;
+    }
     else if(tree->stmtType == STMT_FOR)
-    {}
+    {
+        if(tree->begin_label != -1)
+        {
+            cout<<"L"<<tree->begin_label<<":"<<endl;
+        }
+        recursive_gen_code(tree->child);
+        cout<<"L"<<tree->child->sibling->begin_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling);
+        cout<<"L"<<tree->child->sibling->true_label<<":"<<endl;
+        recursive_gen_code(tree->child->sibling->sibling->sibling);
+        recursive_gen_code(tree->child->sibling->sibling);
+        cout<<"jmp L"<<tree->child->sibling->begin_label<<endl;
+        cout<<"L"<<tree->next_label<<":"<<endl;
+    }
     else if(tree->stmtType == STMT_SCF)
     {}
     else if(tree->stmtType == STMT_PRTF)
@@ -489,10 +529,56 @@ void stmt_gen_code(TreeNode * tree)
     else if(tree->stmtType == STMT_FUNC_DECL)
     {}
     else if(tree->stmtType == STMT_RET)
-    {}
-    else
     {
-        /* code */
+        recursive_gen_code(tree->child);
+        if(tree->child == nullptr)
+        {
+            cout<<"movl %ebp, %esp"<<endl;
+            cout<<"popl %ebp"<<endl;
+            cout<<"ret"<<endl;
+        }
+        else if(tree->child->nodeType == NODE_EXPR)
+        {
+            TreeNode * expr = tree->child;
+            cout<<"movl "<<expr->offset<<"(%ebp), %eax"<<endl;
+            cout<<"movl %ebp, %esp"<<endl;
+            cout<<"popl %ebp"<<endl;
+            cout<<"ret"<<endl;
+        }
+        else
+        {
+            TreeNode * var = tree->child;
+            if(var->nodeType != NODE_CONST)
+            {
+                if(var->type == "char")
+                {
+
+                }
+                else
+                {
+                    cout<<"movl "<<var->offset<<"(%ebp), %eax"<<endl;
+                }
+                   
+            }
+            else if(var->type == "char")
+            {
+                
+            }
+                // cout<<"movl $"<<(unsigned int)(var->name[1])<<" ,%eax"<<endl;
+            else cout<<"movl $"<<var->int_val<<" ,%eax"<<endl;
+            cout<<"movl %ebp, %esp"<<endl;
+            cout<<"popl %ebp"<<endl;
+            cout<<"ret"<<endl;
+        }
+    }
+     else
+    {
+        TreeNode * now = tree->child;
+        while(now != NULL)
+        {
+            recursive_gen_code(now);
+            now = now->sibling;
+        }
     }
 }
 
@@ -521,7 +607,7 @@ void expr_gen_code(TreeNode * tree)
             }
             if(op1->type == "char")
             {
-                
+                cout<<"movl $"<<op1->int_val<<" , %eax"<<endl;
             }
         }
         else if(op1->nodeType == NODE_EXPR)
@@ -543,11 +629,11 @@ void expr_gen_code(TreeNode * tree)
             {
                 if(op2->type == "int")
                 {
-                    cout<<"movl $"<<op2->int_val<<" , %eax"<<endl;
+                    cout<<"movl $"<<op2->int_val<<" , %ebx"<<endl;
                 }
                 if(op2->type == "char")
                 {
-
+                    cout<<"movl $"<<op1->int_val<<" , %eax"<<endl;
                 }
             }
             else if(op2->nodeType == NODE_EXPR)
@@ -555,7 +641,7 @@ void expr_gen_code(TreeNode * tree)
                 if(op2->operatorType == OP_ARRAY_NUM)
                 {
                     cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
-                    cout<<"addl %ebp, %eax"<<endl<<"movl 0(%eax), %ebx"<<endl;
+                    cout<<"addl %ebp, %ebx"<<endl<<"movl 0(%eax), %ebx"<<endl;
                 }
                 else cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
             }
@@ -690,43 +776,58 @@ void expr_gen_code(TreeNode * tree)
                 cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
             }   
         }
-        cout<<"imull $"<<caltypesize(op1type)<<", %ebx, %ebx"<<endl;//NEED TO FIX array!
+        TreeNode * t = tree;
+        while(t->child != nullptr)t = t->child;
+        int m = 1;
+        for(int i = op1->current_dim_num-1;i>0;i--)m = m * t->array_length[t->dim_num - i];
+        cout<<"imull $"<<m<<", %ebx, %ebx"<<endl;//NEED TO FIX array! maybe it's ok?
         cout<<"addl %ebx, %eax"<<endl;
         cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
     }
     else if(tree->operatorType == OP_ASSIGN)
     {
+        if(op2->nodeType == NODE_CONST)
+        {
+            cout<<"movl $"<<op2->int_val<<", %ebx"<<endl;
+        }
+        else if(op2->nodeType == NODE_VAR)
+        {
+            cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
+        }
+        else if(op2->nodeType == NODE_EXPR)
+        {
+            if(op2->operatorType == OP_ARRAY_NUM)
+            {
+                cout<<"movl "<<op1->offset<<"(%ebp), %ebx"<<endl;
+                cout<<"addl %ebp, %ebx"<<endl<<"movl 0(%ebx), %ebx"<<endl;
+            }
+            else cout<<"movl "<<op1->offset<<"(%ebp), %ebx"<<endl;
+        }
         if(op1->nodeType == NODE_VAR)
         {
-            cout<<"movl $"<<op1->offset<<", %eax"<<endl;
+            cout<<"movl %ebx, "<<op1->offset<<"(%ebp)"<<endl;
         }
         else if(op1->nodeType == NODE_EXPR)
         {
             cout<<"movl "<<op1->offset<<"(%ebp), %eax"<<endl;
-        }
-        if(op2->nodeType == NODE_VAR)
-        {
-            cout<<"movl $"<<op2->offset<<", %ebx"<<endl;
-        }
-        else if(op2->nodeType == NODE_CONST)
-        {
-            if(op2->constType == CON_INT)
-            {
-                //TO DO!!!!!!!!!!!!!!!!!
-            }
-        }
-        else if(op2->nodeType == NODE_EXPR)
-        {
-            
+            cout<<"addl %ebp, %eax"<<endl<<"movl %ebx, 0(%eax)"<<endl;       //not familiar with assign
         }
     }
 }
 
-
+void recursive_gen_code(TreeNode * root)
+{
+    if(root == nullptr) return;
+    if(root->nodeType == NODE_EXPR)
+        expr_gen_code(root);
+    if(root->nodeType == NODE_STMT)
+        stmt_gen_code(root);
+}
 
 void gen_code()
 {
     recursive_get_label(root);
+    recursive_gen_code(root);
 }
 
 int main(int argc, char *argv[])
@@ -755,7 +856,7 @@ int main(int argc, char *argv[])
     set_field(root, rootf);
     type_check(root);
     root->printAST();
-    
+    gen_code();
     // cout<<root->child->child->sibling->array_length[1]<<endl;
     
     // gen_code();

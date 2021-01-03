@@ -1500,7 +1500,7 @@ yyreduce:
     {
   case 2:
 #line 39 "src/main.y"
-           {root = new TreeNode(0, NODE_PROG);root->addChild(yyvsp[0]);}
+           {root = new TreeNode(0, NODE_STMT);root->stmtType = STMT_PROG; root->addChild(yyvsp[0]);}
 #line 1505 "src/main.tab.cpp"
     break;
 

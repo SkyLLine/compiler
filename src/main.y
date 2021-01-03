@@ -36,7 +36,7 @@
 
 %%
     program
-    : parts{root = new TreeNode(0, NODE_PROG);root->addChild($1);}
+    : parts{root = new TreeNode(0, NODE_STMT);root->stmtType = STMT_PROG; root->addChild($1);}
     ;
 
 parts

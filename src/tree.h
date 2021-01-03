@@ -81,6 +81,7 @@ enum Stmt_Type{   //decalre statement sentence
     STMT_IF_ELSE,
     STMT_IF,
     STMT_FIELD,
+    STMT_PROG,
 };
 
 enum ID_Type{
@@ -148,6 +149,7 @@ struct TreeNode {
     int array_length[10];
     int dim_num = 1;
     int current_dim_num = 1;
+    int par_num = 0;
     string variable_name;
     int begin_label = -1;
     int true_label = -1;

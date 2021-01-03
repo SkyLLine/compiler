@@ -1,8 +1,11 @@
-int a;
-int main(){
-    for(a=0;a<200;a=a+1){
-        printf("In Loop\n");
-    }
-    printf("End Loop\n");
-    return 0;
+int a = 1;
+if((a==1)&&(a!=2))
+{
+    int b;
+    b = 3;
+}
+else 
+{
+    int c;
+    c = 4;
 }
