@@ -100,6 +100,7 @@ struct Field {
     int size = 0;
     int field_size = 0;
     string table[100];
+    int array_length[100][10];
     string type[100];
     int offs[100];
     int dim[100];

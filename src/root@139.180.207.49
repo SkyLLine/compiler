@@ -1,0 +1,29 @@
+.code32
+.section  .rodata
+STR0:
+.string "my number:%d"
+.text
+.global main
+.type main, @function
+main:
+pushl %ebp
+movl %esp, %ebp
+subl $12, %esp
+movl $1, %ebx
+movl %ebx, -4(%ebp)
+movl $2, %ebx
+movl %ebx, -8(%ebp)
+movl -4(%ebp), %eax
+movl -8(%ebp), %ebx
+addl %ebx, %eax
+movl %eax, -12(%ebp)
+movl -12(%ebp), %eax
+pushl %eax
+pushl $STR0
+call printf
+addl $8, %esp
+movl $0, %eax
+movl %ebp, %esp
+popl %ebp
+ret
+.section .note.GNU-stack,"",@progbits

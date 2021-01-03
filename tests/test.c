@@ -1,11 +1,7 @@
-int a = 1;
-if((a==1)&&(a!=2))
+int main()
 {
-    int b;
-    b = 3;
-}
-else 
-{
-    int c;
-    c = 4;
+    int a, b, c[10];
+    scanf("%d%d", a, b, c[5]);
+    printf("my number:%d", a+b+c[5]);
+    return 0;
 }

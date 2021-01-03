@@ -107,7 +107,7 @@ printf_stmt
 
 
 scanf_stmt
-    : SCANF LPAREN STRING COMMA all_values RPAREN {$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_SCF;}
+    : SCANF LPAREN STRING COMMA all_values RPAREN {$$ = new TreeNode(lineno, NODE_STMT);$$->stmtType = STMT_SCF; $$->addChild($3);$$->addChild($5);}
     
 
 exprs
