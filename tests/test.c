@@ -1,7 +1,10 @@
-int main()
-{
-    int a, b, c[10];
-    scanf("%d%d", a, b, c[5]);
-    printf("my number:%d", a+b+c[5]);
+int main(){
+    int a;
+    int b;
+    int c;
+    scanf("%d",a);
+    scanf("%d",b);
+    c=a*b;
+    printf("test:%d\n",c);
     return 0;
 }
