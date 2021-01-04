@@ -26,7 +26,8 @@
 
 %left ADD SUB
 %left MUL DIV MOD
-%left LOG_AND LOG_OR
+%left LOG_OR
+%left LOG_AND
 %right NOT
 %right NEG POS
 
@@ -187,6 +188,7 @@ expr
     | CHAR{$$ = $1;}
     | all_value{$$ = $1;}
     | IDENTIFIER LPAREN number_list RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($1);$$->addChild($3);}
+    | IDENTIFIER LPAREN RPAREN{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_FUNC;$$->func_name = $1->variable_name;$$->addChild($1);}
     | LPAREN expr RPAREN{$$ = $2;}
     | expr MOD expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MOD;$$->addChild($1);$$->addChild($3);}
     | expr MUL expr{$$ = new TreeNode(lineno, NODE_EXPR);$$->operatorType = OP_MUL;$$->addChild($1);$$->addChild($3);}
