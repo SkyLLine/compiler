@@ -71,9 +71,9 @@ void insert_table(TreeNode * tree, Field* field, string type)
     }
     else if(tree->func)
     {
-        TreeNode* tmp = tree;
+        TreeNode* tmp = tree->sibling;
         int k = 0;
-        while(tmp->nodeType == NODE_STMT && tmp->stmtType == STMT_PARA)k++;
+        while(tmp->nodeType == NODE_STMT && tmp->stmtType == STMT_PARA){k++;tmp = tmp->sibling;}
         field->dim[i] = k;
         tree->dim_num = k;
         field->id_type[i] = ID_FUNC;
@@ -234,7 +234,7 @@ string get_type(TreeNode* tree)
             tmp = tmp->sibling;
         }
         if(tmp->type != "int")return "wrong";
-        global_offset += 4;cout<<"jiajianchengchu"<<global_offset<<endl;
+        global_offset += 4;//cout<<"jiajianchengchu"<<global_offset<<endl;
         func_size[func_count]+=4;
         tree->offset = -func_size[func_count];
         tree->type = tmp->type;
@@ -245,7 +245,7 @@ string get_type(TreeNode* tree)
             TreeNode* tmp = tree->child;
             if(get_type(tmp) != "int")return "wrong";
             tree->type = "int";
-            global_offset += 4;cout<<"zhengfu"<<global_offset<<endl;
+            global_offset += 4;//cout<<"zhengfu"<<global_offset<<endl;
             func_size[func_count]+=4;
             tree->offset = -func_size[func_count];
             return "int";
@@ -273,10 +273,19 @@ string get_type(TreeNode* tree)
         }
         tree->type = "bool";
         global_offset += 4;
-         cout<<"dengyu"<<global_offset<<endl;
+        //  cout<<"dengyu"<<global_offset<<endl;
         func_size[func_count]+=4;
         tree->offset = -func_size[func_count];
         return tree->type;
+        }
+        else if(tree->operatorType == OP_NOT)
+        {
+            if(get_type(tree->child)!="bool")return "wrong";
+            tree->type = "bool";
+            global_offset += 4;
+            func_size[func_count]+=4;
+            tree->offset = -func_size[func_count];
+            return tree->type;
         }
         else if(tree->operatorType == OP_GT ||tree->operatorType == OP_LT ||tree->operatorType == OP_GE ||tree->operatorType == OP_LE)//bool calculate
         {
@@ -289,7 +298,7 @@ string get_type(TreeNode* tree)
         if(tmp->type != "int")return "wrong";
         tree->type = "bool";
         global_offset += 4;
-         cout<<"daxiao"<<global_offset<<endl;
+         //cout<<"daxiao"<<global_offset<<endl;
         func_size[func_count]+=4;
         tree->offset = -func_size[func_count];
         return tree->type;
@@ -304,7 +313,7 @@ string get_type(TreeNode* tree)
         }
         if(tmp->type != "bool")return "wrong";
         tree->type = "bool";
-        global_offset += 4;cout<<"huoyu"<<global_offset<<endl;
+        global_offset += 4;//cout<<"huoyu"<<global_offset<<endl;
         func_size[func_count]+=4;
         tree->offset = -func_size[func_count];
         return tree->type;
@@ -317,7 +326,7 @@ string get_type(TreeNode* tree)
             tree->type = "pointer";
             global_offset += 4;
             func_size[func_count]+=4;
-            cout<<"array"<<endl;
+           // cout<<"array"<<endl;
             tree->offset = -func_size[func_count];
             if(tree->current_dim_num == 0)
             {
@@ -334,11 +343,18 @@ string get_type(TreeNode* tree)
             {
                 if(tree->child->variable_name == rootf->table[i])
                 {
-                    global_offset += 4;cout<<"hanshudiaoyong"<<global_offset<<endl;
+                    global_offset += 4;//cout<<"hanshudiaoyong"<<global_offset<<endl;
                     func_size[func_count]+=4;
                     tree->offset = -func_size[func_count];
                     tree->child->type = rootf->type[i];
                     tree->child->using_func = true;
+                    tree->using_func = true;
+                    TreeNode * tmp = tree->child->sibling;
+                    while(tmp != nullptr)
+                    {
+                        get_type(tmp);
+                        tmp = tmp->sibling;
+                    }
                     return tree->child->type;
                 }
             }
@@ -354,7 +370,7 @@ void type_check(TreeNode* tree)
     // cout<<"nodetype: "<<tree->nodeType<<endl;
     if(tree->nodeType == NODE_EXPR)
     {
-        if(get_type(tree)=="wrong")cout<<"type error!"<<1<<endl;
+        if(get_type(tree)=="wrong")cout<<"type error!"<<1<<tree->operatorType<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_ASSIGN)
     {
@@ -761,6 +777,18 @@ void stmt_gen_code(TreeNode * tree)
             if(rootf->table[i] == tree->child->sibling->variable_name)break;
         }
         cout<<"subl $"<<func_size[i+1]<<", %esp"<<endl;
+        if(tree->child->sibling->variable_name != "main")
+        {
+            //to do
+            TreeNode * tmp = tree->child->sibling->sibling;
+            int para_l = tree->child->sibling->dim_num;
+            while(tmp->nodeType == NODE_STMT && tmp->stmtType == STMT_PARA)
+            {
+                cout<<"movl "<<tmp->child->sibling->offset+8+para_l*4<<"(%ebp), %eax"<<endl;
+                cout<<"mov %eax, "<<tmp->child->sibling->offset<<"(%ebp)"<<endl;
+                tmp = tmp->sibling;
+            }
+        }
         TreeNode * tmp = tree->child->sibling->sibling;
         while(tmp->stmtType != STMT_FUNC_DEF)tmp = tmp->sibling;
         recursive_gen_code(tmp);
@@ -832,6 +860,54 @@ void expr_gen_code(TreeNode * tree)
         //     tmp = tmp->sibling;
         // }
         // int size = 
+        
+        // to do
+        TreeNode * t = tree->child->sibling;
+        while(t != nullptr)
+        {
+            recursive_gen_code(t);
+            t = t->sibling;
+        }
+        TreeNode * tmp = tree->child->sibling;
+        while(tmp != nullptr)
+        {
+            if(tmp->nodeType == NODE_EXPR)
+            {
+                if(tmp->operatorType == OP_ARRAY_NUM)
+                {
+                cout<<"movl "<<tmp->offset<<"(%ebp), %eax"<<endl;
+                cout<<"addl %ebp, %eax"<<endl<<"movl 0(%eax), %eax"<<endl;
+                }
+                else
+                {
+                    cout<<"movl "<<tmp->offset<<"(%ebp), %eax"<<endl;
+                }
+                
+            }
+            else if(tmp->nodeType == NODE_VAR)
+            {
+                cout<<"movl "<<tmp->offset<<"(%ebp), %eax"<<endl;
+            }
+            else
+            {
+                cout<<"movl $"<<tmp->int_val<<", %eax"<<endl;
+            }
+            cout<<"pushl %eax"<<endl;
+            tmp = tmp->sibling;
+        }
+        cout<<"call "<<tree->child->variable_name<<endl;
+        TreeNode* now = tree->child;
+        int c = 0;
+        for(int i = 0;i<rootf->size;i++)
+        {
+            if(now->variable_name == rootf->table[i])
+            {
+                c = i+1;
+                break;
+            }
+        }
+        cout<<"addl $"<<func_size[c]<<", %esp"<<endl;
+        cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
     }
     recursive_gen_code(tree->child);
     recursive_gen_code(tree->child->sibling);
@@ -960,7 +1036,7 @@ void expr_gen_code(TreeNode * tree)
         else if(tree->operatorType == OP_GE)
         {
             cout<<"cmp %ebx, %eax"<<endl;
-            cout<<"jg3 L"<<tree->true_label<<endl;
+            cout<<"jge L"<<tree->true_label<<endl;
             cout<<"jmp L"<<tree->false_label<<endl;
             if(tree->next_true) cout<<"L"<<tree->true_label<<":"<<endl;
             if(tree->next_false) cout<<"L"<<tree->false_label<<":"<<endl;
@@ -1044,7 +1120,7 @@ void expr_gen_code(TreeNode * tree)
         {
             if(op2->operatorType == OP_ARRAY_NUM)
             {
-                cout<<"movl "<<op1->offset<<"(%ebp), %ebx"<<endl;
+                cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
                 cout<<"addl %ebp, %ebx"<<endl<<"movl 0(%ebx), %ebx"<<endl;
             }
             else cout<<"movl "<<op2->offset<<"(%ebp), %ebx"<<endl;
@@ -1103,10 +1179,10 @@ int main(int argc, char *argv[])
     // cout<<search_var("s", rootf);
     set_field(root, rootf);
     type_check(root);
-    root->printAST();
+    // root->printAST();
     gen_code();
-    cout<<func_size[1]<<" "<<func_size[2]<<" "<<func_size[3]<<" "<<func_size[4]<<endl;
-    cout<<rootf->table[0]<<" "<<rootf->table[1]<<" "<<rootf->table[2]<<" "<<rootf->table[3]<<endl;
+    // cout<<func_size[1]<<" "<<func_size[2]<<endl;//<" "<<func_size[3]<<" "<<func_size[4]<<endl;
+    // cout<<rootf->table[0]<<" "<<rootf->table[1]<<endl;//<" "<<rootf->table[2]<<" "<<rootf->table[3]<<endl;
     // cout<<root->child->child->sibling->array_length[1]<<endl;
     
     // gen_code();
