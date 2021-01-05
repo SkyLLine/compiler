@@ -355,6 +355,7 @@ string get_type(TreeNode* tree)
                         get_type(tmp);
                         tmp = tmp->sibling;
                     }
+                    tree->type = tree->child->type;
                     return tree->child->type;
                 }
             }
@@ -370,7 +371,7 @@ void type_check(TreeNode* tree)
     // cout<<"nodetype: "<<tree->nodeType<<endl;
     if(tree->nodeType == NODE_EXPR)
     {
-        if(get_type(tree)=="wrong")cout<<"type error!"<<1<<tree->operatorType<<endl;
+        if(get_type(tree)=="wrong")cout<<"type error!"<<1<<" "<<tree->child->sibling->variable_name<<endl;
     }
     if(tree->nodeType == NODE_STMT && tree->stmtType == STMT_ASSIGN)
     {
@@ -906,7 +907,7 @@ void expr_gen_code(TreeNode * tree)
                 break;
             }
         }
-        cout<<"addl $"<<func_size[c]<<", %esp"<<endl;
+        cout<<"addl $"<<tree->dim_num*4<<", %esp"<<endl;
         cout<<"movl %eax, "<<tree->offset<<"(%ebp)"<<endl;
     }
     recursive_gen_code(tree->child);

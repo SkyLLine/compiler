@@ -65,7 +65,7 @@ void TreeNode::printNodeInfo()
         cout<<"lineno "<<lineno<<" ";
     cout<<nodeID<<" ";
     if(nodeType == 1)cout<<"NODE_CONST "<<"offset"<<offset<<" "<<int_val<<" "<<char_val;
-    if(nodeType == 2)cout<<"NODE_VAR "<<"offset"<<offset<<" "<<variable_name<<" "<<array;
+    if(nodeType == 2)cout<<"NODE_VAR "<<"offset"<<offset<<" "<<variable_name<<" "<<array<<" "<<type;
     if(nodeType == 3)cout<<"NODE_EXPR "<<"offset "<<offset<<" optype"<<operatorType<<" using func"<<using_func;
     if(nodeType == 4)cout<<"NODE_TYPE "<<"offset"<<offset;
     if(nodeType == 5)cout<<"NODE_STMT"<<stmtType;
